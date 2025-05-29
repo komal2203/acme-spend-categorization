@@ -1,0 +1,26 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.env
+
+# Data outputs and intermediate files
+data/categorized.csv
+data/manual_review.csv
+data/unspsc_cache.json
+data/unspsc_cache.meta
+
+# Logs
+logs/
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Jupyter / VSCode / IDE configs (if any)
+.ipynb_checkpoints/
+.vscode/
+*.swp
