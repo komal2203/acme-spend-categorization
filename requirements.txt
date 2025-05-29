@@ -1,0 +1,12 @@
+pandas
+pyyaml
+fuzzywuzzy[speedup]
+sentence-transformers
+torch
+openai
+streamlit
+schedule
+nltk
+faiss-cpu
+watchdog
+python-dotenv

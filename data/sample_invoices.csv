@@ -1,0 +1,44 @@
+Invoice ID,Supplier,SKU,Managing Account,Amount,Description
+001,ABC Corp,Scissors,Account1,$1000,Office Supplies
+002,XYZ Inc,Mouse,Account2,$2000,IT Equipment
+003,ABC Corp,Desk lamps,Account3,$1500,Office Furniture
+004,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds
+005,Global Industries,Barley seeds,Account2,$920,Cereal seeds
+006,GreenFields Co,Ammonium nitrate fertilizer,Account3,"$1,200",Fertilizer
+007,BuildRight Inc,Steel beam,Account4,"$4,500",Construction materials
+008,ToolMasters,Electric drill,Account5,$350,Power tool
+009,MedTech Solutions,Latex gloves,Account1,$180,Medical gloves
+010,LabWorks LLC,Surgical mask,Account2,$75,Protective mask
+011,CleanWell Ltd,Broom,Account3,$45,Floor cleaning tool
+012,FreshFoods Ltd,Disposable plates,Account4,$120,Foodservice disposables
+013,TechGear,Desktop computer,Account5,"$2,200",Office computer
+014,NetConnect,Router,Account1,$300,Network router
+015,PrintPro,Printer ink,Account2,$230,Ink cartridge
+016,OfficeEssentials,Printer paper,Account3,$110,Copy paper
+017,SecureSafe,Fire alarm system,Account4,"$1,750",Fire safety equipment
+018,WatchGuard,CCTV camera,Account5,$550,Surveillance camera
+019,HomeComforts,Refrigerator,Account1,"$1,300",Kitchen appliance
+020,KitchenPro,Cookware set,Account2,$400,Kitchenware
+021,AutoParts Co,Hydraulic jack,Account3,$640,Garage equipment
+022,ServicePlus,Consulting fee,Account4,"$2,500",Professional consulting
+023,MaintMasters,HVAC servicing,Account5,"$1,100",Maintenance service
+024,FreshFoods Ltd,Live chickens,Account1,$320,Live poultry
+025,AgriSource,Live salmon,Account2,$450,Live fish
+026,PestControl Inc,Silkworms,Account3,$210,Live insects
+027,PetWorld,Cats,Account4,$150,Live animals (cats)
+028,PetWorld,Dogs,Account5,$180,Live animals (dogs)
+029,GreenFields Co,Bean seeds,Account1,$95,Legume seeds
+030,GreenFields Co,Carrot seeds,Account2,$85,Vegetable seeds
+031,OfficeEssentials,Office chair,Account3,$780,Furniture
+032,FurnitureHub,Desk lamp,Account4,$145,Lighting fixture
+033,CleanWell Ltd,Dishwasher,Account5,$900,Kitchen cleaning machine
+034,MedTech Solutions,Test tubes,Account1,$60,Lab glassware
+035,LabWorks LLC,Beakers,Account2,$55,Lab container
+036,SecureSafe,Bicycle helmet,Account3,$70,Safety gear
+037,HealthFirst,First aid kit,Account4,$130,Medical kit
+038,ServicePlus,Software license,Account5,"$2,000",Software subscription
+039,PrintPro,Laser printer,Account1,"$1,100",Printing hardware
+040,NetConnect,Network switch,Account2,$420,Switching equipment
+041,TechGear,Smartphone,Account3,$800,Mobile device
+042,BuildRight Inc,Safety helmet,Account4,$65,Construction safety gear
+043,ToolMasters,Hand saw,Account5,$120,Hand tool
