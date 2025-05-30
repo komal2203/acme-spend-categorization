@@ -1,7 +1,4 @@
 Invoice ID,Supplier,SKU,Managing Account,Amount,Description
-001,ABC Corp,Scissors,Account1,$1000,Office Supplies
-002,XYZ Inc,Mouse,Account2,$2000,IT Equipment
-003,ABC Corp,Desk lamps,Account3,$1500,Office Furniture
 004,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds
 005,Global Industries,Barley seeds,Account2,$920,Cereal seeds
 006,GreenFields Co,Ammonium nitrate fertilizer,Account3,"$1,200",Fertilizer
