@@ -11,10 +11,17 @@ def fetch_unspsc():
     try:
         meta = json.loads(open(META).read())
         if time.time() - meta['fetched_at'] < TTL:
-            return pd.read_json(CACHE, orient='records')
+            df = pd.read_json(CACHE, orient='records')
+            df = df.rename(columns={
+                'Key':'key',
+                'Parent key':'parent',
+                'Code':'code',
+                'Title':'title'
+            })
+            return df
     except:
         pass
-    df = pd.read_csv(CSV, dtype=str, encoding='latin-1')  # or UTF-8 if re-saved
+    df = pd.read_csv(CSV, dtype=str, encoding='utf-8-sig')
     df = df.rename(columns={
         'Key':'key',
         'Parent key':'parent',
@@ -28,6 +35,7 @@ def fetch_unspsc():
 
 # Load the taxonomy
 unspsc_df = fetch_unspsc()
+print("unspsc_df columns:", unspsc_df.columns)
 
 # 1) Map by key so we can follow parents
 # key_map = {r['key']: r for _, r in unspsc_df.iterrows()}
