@@ -40,8 +40,14 @@ def classify_with_ai(desc: str, supp: str, candidates) -> dict:
     args = json.loads(args_str)
 
     code = args.get('code')
-    if not code or len(code) != 8 or not code.isdigit():
-        raise ValueError(f"Invalid or incomplete UNSPSC code returned: {code}")
+    if not (code and len(code) == 8 and code.isdigit()):
+        # Return a low-confidence result for manual review
+        return {
+        "commodity_code": code or "",
+        "commodity_title": "",
+        "confidence": 0.0,
+        "matched_rule": "",
+        }
 
     if code not in unspsc_map:
         raise KeyError(f"UNSPSC code '{code}' not found in taxonomy map")
