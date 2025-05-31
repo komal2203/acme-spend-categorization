@@ -5,6 +5,11 @@ from src.rule_filter import apply_rules
 from src.retrieval import shortlist
 from src.genai_inference import classify_with_ai
 from src.taxonomy_service import unspsc_map
+import time
+import logging
+import concurrent.futures
+
+logging.basicConfig(level=logging.INFO)
 
 # Configure logging
 logging.basicConfig(filename='logs/pipeline.log', level=logging.INFO,
@@ -25,14 +30,29 @@ def process_row(r):
     return target, rec
 
 # Main pipeline
+
 def run_pipeline():
+    total_start = time.time()
+    t0 = time.time()
     df = load_and_clean(DATA_PATH)
+    logging.info(f"Data loading/cleaning took {time.time() - t0:.2f} seconds")
+    t1 = time.time()
     final, manual = [], []
-    for _, r in df.iterrows():
-        tgt, rec = process_row(r)
+    logging.info(f"Business rule application took {time.time() - t1:.2f} seconds")
+
+    t2 = time.time()
+    # Use ThreadPoolExecutor for parallel GenAI calls
+    with concurrent.futures.ThreadPoolExecutor(max_workers=40) as executor:
+        results = list(executor.map(process_row, [r for _, r in df.iterrows()]))
+    for tgt, rec in results:
         (manual if tgt=='manual' else final).append(rec)
+    logging.info(f"GenAI inference took {time.time() - t2:.2f} seconds")
+
+    t3 = time.time()
     pd.DataFrame(final).to_csv('data/categorized.csv',index=False)
     pd.DataFrame(manual).to_csv('data/manual_review.csv',index=False)
     logging.info(f"Pipeline done: {len(final)} final, {len(manual)} manual")
-
+    logging.info(f"Output writing took {time.time() - t3:.2f} seconds")
+    logging.info(f"Total pipeline time: {time.time() - total_start:.2f} seconds")
+    
 if __name__=='__main__': run_pipeline()
