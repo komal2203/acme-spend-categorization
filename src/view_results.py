@@ -6,6 +6,7 @@ import altair as alt
 import matplotlib.pyplot as plt
 import plotly.express as px
 import sys  # <-- Add this import
+import time
 
 st.set_page_config(page_title='Invoice Categorization Results', layout='wide')
 st.markdown("""
@@ -47,15 +48,17 @@ if run_model:
             "<div style=' font-size:1.2rem; color:#4F8BF9;'>Categorizing...</div>",
             unsafe_allow_html=True
         )
+        start_time = time.time()
         result = subprocess.run(
             [sys.executable, "-m", "src.pipeline"],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True
         )
+        elapsed = time.time() - start_time
         msg_placeholder.empty()
     if result.returncode == 0:
-        st.success("Categorization complete! See results below.")
+        st.success(f"Categorization complete! (Time taken: {elapsed:.2f} seconds) See results below.")
         model_ran = True
     else:
         st.error("There was an error running the model:")
@@ -66,8 +69,11 @@ if run_model:
 if (run_model and model_ran) or (
     os.path.exists('data/sample_invoices.csv') and os.path.exists('data/categorized.csv') and run_model
 ):
+    display_start = time.time()
     input_df = pd.read_csv('data/sample_invoices.csv')
     output_df = pd.read_csv('data/categorized.csv')
+    display_elapsed = time.time() - display_start
+    st.info(f"Results loaded and displayed in {display_elapsed:.2f} seconds.")
 
     # Normalize column names for matching
     input_df.columns = [c.lower().replace(' ', '_') for c in input_df.columns]
