@@ -1,2 +1,45 @@
-﻿Invoice ID,Supplier,SKU,Managing Account,Amount,Description
+Invoice ID,Supplier,SKU,Managing Account,Amount,Description
 4,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds
+5,Global Industries,Barley seeds,Account2,$920,Cereal seeds
+6,GreenFields Co,Ammonium nitrate fertilizer,Account3,"$1,200",Fertilizer
+7,BuildRight Inc,Steel beam,Account4,"$4,500",Construction materials
+8,ToolMasters,Electric drill,Account5,$350,Power tool
+9,MedTech Solutions,Latex gloves,Account1,$180,Medical gloves
+10,LabWorks LLC,Surgical mask,Account2,$75,Protective mask
+11,CleanWell Ltd,Broom,Account3,$45,Floor cleaning tool
+12,FreshFoods Ltd,Disposable plates,Account4,$120,Foodservice disposables
+13,TechGear,Desktop computer,Account5,"$2,200",Office computer
+14,NetConnect,Router,Account1,$300,Network router
+15,PrintPro,Printer ink,Account2,$230,Ink cartridge
+16,OfficeEssentials,Printer paper,Account3,$110,Copy paper
+17,SecureSafe,Fire alarm system,Account4,"$1,750",Fire safety equipment
+18,WatchGuard,CCTV camera,Account5,$550,Surveillance camera
+19,HomeComforts,Refrigerator,Account1,"$1,300",Kitchen appliance
+20,KitchenPro,Cookware set,Account2,$400,Kitchenware
+21,AutoParts Co,Hydraulic jack,Account3,$640,Garage equipment
+22,ServicePlus,Consulting fee,Account4,"$2,500",Professional consulting
+23,MaintMasters,HVAC servicing,Account5,"$1,100",Maintenance service
+24,FreshFoods Ltd,Live chickens,Account1,$320,Live poultry
+25,AgriSource,Live salmon,Account2,$450,Live fish
+26,PestControl Inc,Silkworms,Account3,$210,Live insects
+27,PetWorld,Cats,Account4,$150,Live animals (cats)
+28,PetWorld,Dogs,Account5,$180,Live animals (dogs)
+29,GreenFields Co,Bean seeds,Account1,$95,Legume seeds
+30,GreenFields Co,Carrot seeds,Account2,$85,Vegetable seeds
+31,OfficeEssentials,Office chair,Account3,$780,Furniture
+32,FurnitureHub,Desk lamp,Account4,$145,Lighting fixture
+33,CleanWell Ltd,Dishwasher,Account5,$900,Kitchen cleaning machine
+34,MedTech Solutions,Test tubes,Account1,$60,Lab glassware
+35,LabWorks LLC,Beakers,Account2,$55,Lab container
+36,SecureSafe,Bicycle helmet,Account3,$70,Safety gear
+37,HealthFirst,First aid kit,Account4,$130,Medical kit
+38,ServicePlus,Software license,Account5,"$2,000",Software subscription
+39,PrintPro,Laser printer,Account1,"$1,100",Printing hardware
+40,NetConnect,Network switch,Account2,$420,Switching equipment
+41,TechGear,Smartphone,Account3,$800,Mobile device
+42,BuildRight Inc,Safety helmet,Account4,$65,Construction safety gear
+43,ToolMasters,Hand saw,Account5,$120,Hand tool
+44,NatureSeeds,Zucchini seeds,Account5,$830,Vegetable seeds
+45,AgriSource,Delta-100,Account1,$1250,High-precision industrial widget for general use
+46,TransEquip Inc,XJ Pack,Account2,$2400,Multi-purpose equipment bundle with unclear specifications
+47,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
