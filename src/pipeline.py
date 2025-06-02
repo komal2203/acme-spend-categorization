@@ -25,7 +25,7 @@ def process_row(r):
     info = apply_rules(desc)
     rule_time = time.time() - t0
 
-    src  = 'rule' if info else 'genai'
+    src  = 'Rule' if info else 'GenAI'
     shortlist_time = 0
     genai_time = 0
 

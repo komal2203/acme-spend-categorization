@@ -80,8 +80,9 @@ h1 {
 
 h2 {
   color: #3a3a6a;
-  margin-top: 2em;
+  /* margin-top: 1em;
   margin-bottom: 1em;
+} */
 }
 .inputcontainer {
   display: flex;
@@ -179,6 +180,9 @@ button:hover {
 }
 .resulttitle {
   display: flex;
+  /* margin: 2em; */
+  margin-top: 3em;
+  margin-bottom: 2em;
   justify-content: space-between;
   align-items: center;
 }
@@ -186,7 +190,7 @@ button:hover {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 1.5em;
+  margin-top: 0.5em;
   background: #f9fbff;
   border-radius: 8px;
   overflow: hidden;
@@ -368,8 +372,54 @@ canvas {
 }
 
 #categoryPieChart {
-  width: 650px !important; /* Force width */
-  height: 650px !important; /* Force height */
+  width: 600px !important; /* Force width */
+  height: 600px !important; /* Force height */
+}
+#confidencePieChart {
+  width: 600px !important; /* Force width */
+  height: 600px !important;
+}
+
+/* Pie/Bar chart with info box layout */
+.chart-with-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10em;
+  margin-bottom: 2em;
+  margin: auto;
+}
+
+.chart-canvas {
+  flex: 0 0 auto;
+  /* Optionally set a max-width for the chart */
+}
+
+.chart-info {
+  flex: 1 1 350px;
+  max-width: 750px;
+  background: #e3f3ff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(79, 139, 249, 0.08);
+  padding: 2.5em 2.5em 1.2em 2.5em;
+  font-size: 1.3em;
+}
+
+.chart-info h3 {
+  margin-top: 0;
+  color: #163e93;
+  font-size: 2em;
+  margin-bottom: 0.2em;
+}
+
+.chart-info ul {
+  margin: 0.15em 0 0 1.2em;
+  padding: 0;
+  font-size: 0.98em;
+}
+
+.chart-info li {
+  margin-bottom: 0.5em;
 }
 
 .credits {
@@ -377,8 +427,8 @@ canvas {
   position: fixed; /* Fix the div to the viewport */
   bottom: 0; /* Stay at the bottom of the screen */
   width: 100%; /* Stretch across the screen */
-  padding: 0.4em; /* Add padding for better spacing */
-  font-size: 1.3em;
+  padding: 0.3em; /* Add padding for better spacing */
+  font-size: 1.1em;
   color: #ffffff; /* Change text color to white for contrast */
   font-family: "Lucida Sans", "Lucida Sans Regular", "Lucida Grande",
     "Lucida Sans Unicode", Geneva, Verdana, sans-serif;

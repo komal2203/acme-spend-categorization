@@ -17,7 +17,7 @@
       <div class="error-message">{{ error }}</div>
       {% endif %}
       {% if not data %}
-      <p>No records available for manual review.</p>
+      <!-- <p>No records available for manual review.</p> -->
       {% else %}
       <table class="result-table">
         <thead>
@@ -38,10 +38,10 @@
               <td>{{ row.commodity_code }}</td>
               <td>
                 <select name="corrected_code">
-                  {% for code, details in unspsc_map.items() %}
-                  <option value="{{ code }}">
-                    {{ code }} – {{ details['commodity_title'] }}
-                  </option>
+                  {% for code, title in unspsc_dropdown_map.items() %}
+                    {% if title %}
+                      <option value="{{ code }}">{{ code }} – {{ title }}</option>
+                    {% endif %}
                   {% endfor %}
                 </select>
               </td>
