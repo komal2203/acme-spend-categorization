@@ -1,5 +1,2 @@
-Invoice ID,Supplier,SKU,Managing Account,Amount,Description
-37,NatureSeeds,Zucchini seeds,Account5,$830,Vegetable seeds
-38,AgriSource,Delta-100,Account1,$1250,High-precision industrial widget for general use
-39,TransEquip Inc,XJ Pack,Account2,$2400,Multi-purpose equipment bundle with unclear specifications
-47,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
+﻿Invoice ID,Supplier,SKU,Managing Account,Amount,Description
+4,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds

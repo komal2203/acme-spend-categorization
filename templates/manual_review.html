@@ -10,11 +10,9 @@
     />
   </head>
   <body>
-    <div id="loading-indicator" class="manual-review-loading-message">
-      Loading data...
-    </div>
+   
     <div class="container">
-      <h1>Low-Confidence Manual Review</h1>
+      <h1>Invoice Categorization – Manual Review</h1>
       {% if error %}
       <div class="error-message">{{ error }}</div>
       {% endif %}
@@ -68,6 +66,9 @@
         >
       </div>
       {% endif %}
+      <div id="loading-indicator" class="manual-review-loading-message">
+        Loading data...
+      </div>
     </div>
 
     <script>
@@ -81,3 +82,4 @@
     </script>
   </body>
 </html>
+

@@ -38,24 +38,36 @@
 
       {% if error %}
       <div class="error">{{ error }}</div>
-      {% endif %} {% if result_table %}
+      {% endif %}
+      
+      {% if result_table %}
       <div class="outputcontainer">
+        {% if uploaded_filename %}
+        <label>
+          <span class="modeltime">File processed: </span>{{ uploaded_filename }}
+        </label>
         <div class="resulttitle">
           <h2>
             <span class="modeltime">Results Table</span>
           </h2>
           <div class="buttonsdiv">
-              <a href="{{ url_for('download_manual') }}" class="download-btn">Download Manual Review CSV</a>
-              <a href="{{ url_for('download') }}" class="download-btn"
-                >Download Categorized Output</a
-              >
+            <a href="{{ url_for('download_manual') }}" class="download-btn"
+              >Download Manual Review CSV</a
+            >
+            <a href="{{ url_for('download') }}" class="download-btn"
+              >Download Categorized Output</a
+            >
           </div>
         </div>
+
+        {% endif %}
         <div class="table-container">{{ result_table|safe }}</div>
 
         <div class="manual-review-container">
-            <a href="{{ url_for('manual_review') }}" class="manual-review-btn">Go to Manual Review</a>
-          </div>
+          <a href="{{ url_for('manual_review') }}" class="manual-review-btn"
+            >Go to Manual Review</a
+          >
+        </div>
 
         {% if chart_data and chart_data|length > 0 %}
         <h2>
@@ -215,7 +227,7 @@
       {% endif %}
     </div>
     <div class="credits">
-      <p>Made by Komal, Subhav, Sidhant, Prayash</p>
+      <p>Made by Subhav, Sidhant, Prayash, Komal</p>
     </div>
 
     <script>

@@ -221,6 +221,118 @@ def manual_review():
         unspsc_map=unspsc_dropdown_map
     )
     
+# @app.route("/", methods=["GET", "POST"])
+# def index():
+#     result_table = None
+#     chart_data = []
+#     pie_chart_data = []
+#     error = None
+#     elapsed = None
+
+#     if request.method == "POST":
+#         invoice_file = request.files.get("invoice_file")
+
+#         if not invoice_file or not allowed_file(invoice_file.filename):
+#             error = "Please upload a valid invoice CSV file."
+#             return render_template(
+#                 "index.html",
+#                 error=error,
+#                 elapsed=elapsed,
+#                 chart_data=chart_data,
+#                 pie_chart_data=pie_chart_data,
+#                 result_table=result_table
+#             )
+
+#         invoice_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(invoice_file.filename))
+#         invoice_file.save(invoice_path)
+
+#         # Move uploaded file to data/sample_invoices.csv
+#         os.replace(invoice_path, "data/sample_invoices.csv")
+
+#         # Time logging start
+#         start_time = time.time()
+
+#         # Run the pipeline
+#         result = subprocess.run(
+#             [sys.executable, "-m", "src.pipeline"],
+#             stdout=subprocess.PIPE,
+#             stderr=subprocess.PIPE,
+#             text=True
+#         )
+
+#         # Time logging end
+#         elapsed = time.time() - start_time
+#         print(f"Model pipeline execution time: {elapsed:.2f} seconds")
+
+#         if result.returncode != 0:
+#             error = "Error running categorization pipeline: " + result.stderr
+#             return render_template(
+#                 "index.html",
+#                 error=error,
+#                 elapsed=elapsed,
+#                 chart_data=chart_data,
+#                 pie_chart_data=pie_chart_data,
+#                 result_table=result_table
+#             )
+
+#         # Load results
+#         result_df = pd.read_csv("data/categorized.csv")
+#         result_df.columns = [c.strip().lower().replace(' ', '_') for c in result_df.columns]
+
+#         # Prepare chart data BEFORE renaming columns for display
+#         commodity_col = next((c for c in result_df.columns if 'commodity_title' in c), None)
+#         if commodity_col and not result_df.empty:
+#             result_df = result_df.dropna(subset=[commodity_col])
+            
+#             # Adjust the number of top categories for the bar graph
+#             top_n = 15  # Change this number to adjust the number of top categories
+#             vc_df = result_df[commodity_col].value_counts().nlargest(top_n).reset_index()
+#             cat_col = vc_df.columns[0]
+#             count_col = vc_df.columns[1]
+#             chart_data = (
+#                 vc_df.rename(columns={cat_col: 'category', count_col: 'count'})
+#                 .to_dict(orient='records')
+#             )
+            
+#             # Prepare pie chart data for top 5 commodity_titles
+#             pie_vc_df = result_df[commodity_col].value_counts().nlargest(5).reset_index()
+#             pie_cat_col = pie_vc_df.columns[0]
+#             pie_count_col = pie_vc_df.columns[1]
+#             pie_chart_data = (
+#                 pie_vc_df.rename(columns={pie_cat_col: 'category', pie_count_col: 'count'})
+#                 .to_dict(orient='records')
+#             )
+#         else:
+#             chart_data = []
+#             pie_chart_data = []
+
+#         # Remove unnecessary columns for display
+#         cols_to_remove = [
+#             'segment_code', 'segment_title',
+#             'family_code', 'family_title',
+#             'class_code', 'class_title'
+#         ]
+#         result_df = result_df.drop(columns=[c for c in cols_to_remove if c in result_df.columns])
+
+#         result_table = result_df.to_html(classes="result-table", index=False)
+
+#         return render_template(
+#             "index.html",
+#             result_table=result_table,
+#             elapsed=elapsed,
+#             chart_data=chart_data,
+#             pie_chart_data=pie_chart_data,
+#         )
+
+#     # For GET requests, just render the page with no results
+#     return render_template(
+#         "index.html",
+#         result_table=result_table,
+#         elapsed=elapsed,
+#         chart_data=chart_data,
+#         pie_chart_data=pie_chart_data
+#     )
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     result_table = None
@@ -228,6 +340,7 @@ def index():
     pie_chart_data = []
     error = None
     elapsed = None
+    uploaded_filename = None  # Track the uploaded file name
 
     if request.method == "POST":
         invoice_file = request.files.get("invoice_file")
@@ -240,10 +353,12 @@ def index():
                 elapsed=elapsed,
                 chart_data=chart_data,
                 pie_chart_data=pie_chart_data,
-                result_table=result_table
+                result_table=result_table,
+                uploaded_filename=uploaded_filename
             )
 
-        invoice_path = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(invoice_file.filename))
+        uploaded_filename = secure_filename(invoice_file.filename)
+        invoice_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_filename)
         invoice_file.save(invoice_path)
 
         # Move uploaded file to data/sample_invoices.csv
@@ -272,7 +387,8 @@ def index():
                 elapsed=elapsed,
                 chart_data=chart_data,
                 pie_chart_data=pie_chart_data,
-                result_table=result_table
+                result_table=result_table,
+                uploaded_filename=uploaded_filename
             )
 
         # Load results
@@ -322,6 +438,7 @@ def index():
             elapsed=elapsed,
             chart_data=chart_data,
             pie_chart_data=pie_chart_data,
+            uploaded_filename=uploaded_filename
         )
 
     # For GET requests, just render the page with no results
@@ -330,9 +447,10 @@ def index():
         result_table=result_table,
         elapsed=elapsed,
         chart_data=chart_data,
-        pie_chart_data=pie_chart_data
+        pie_chart_data=pie_chart_data,
+        uploaded_filename=uploaded_filename
     )
-
+    
 @app.route("/download")
 def download():
     # Adjust the path if your output file is elsewhere
