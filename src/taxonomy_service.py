@@ -35,7 +35,7 @@ def fetch_unspsc():
 
 # Load the taxonomy
 unspsc_df = fetch_unspsc()
-print("unspsc_df columns:", unspsc_df.columns)
+# print("unspsc_df columns:", unspsc_df.columns)
 
 # 1) Map by key so we can follow parents
 # key_map = {r['key']: r for _, r in unspsc_df.iterrows()}
