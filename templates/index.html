@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Spend Categorization</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <!-- Spinner overlay OUTSIDE container for full-page coverage -->
+    <div id="spinner" class="spinner" style="display: none">
+      <div class="loader"></div>
+      <div class="spinner-text">Processing, please wait...</div>
+    </div>
+    <div class="container">
+      <img
+        src="{{ url_for('static', filename='mck1.png') }}"
+        alt="Dashboard Image"
+        style="height: 60px; width: 215px"
+      />
+      <h1>📄 Spend Categorization Dashboard</h1>
+      <form class="inputcontainer" method="post" enctype="multipart/form-data">
+        <label><span class="modeltime"> Upload Invoice CSV:</span></label>
+        <div class="fileupload">
+          <input type="file" name="invoice_file" accept=".csv" required />
+          <button type="submit">Run Model</button>
+        </div>
+        {% if elapsed is not none %}
+        <label>
+          <span class="modeltime">Model Categorization Time:</span> {{
+          "%.2f"|format(elapsed) }} seconds
+        </label>
+        {% endif %}
+      </form>
+
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %} {% if result_table %}
+      <div class="outputcontainer">
+        <div class="resulttitle">
+          <h2>
+            <span class="modeltime">Results Table</span>
+          </h2>
+          <div class="buttonsdiv">
+              <a href="{{ url_for('download_manual') }}" class="download-btn">Download Manual Review CSV</a>
+              <a href="{{ url_for('download') }}" class="download-btn"
+                >Download Categorized Output</a
+              >
+          </div>
+        </div>
+        <div class="table-container">{{ result_table|safe }}</div>
+
+        <div class="manual-review-container">
+            <a href="{{ url_for('manual_review') }}" class="manual-review-btn">Go to Manual Review</a>
+          </div>
+
+        {% if chart_data and chart_data|length > 0 %}
+        <h2>
+          <span class="modeltime">Category Distribution - Top 15</span>
+        </h2>
+        <canvas id="categoryChart" width="400" height="200"></canvas>
+        <script>
+          const chartData = {{ chart_data|tojson }};
+          const labels = chartData.map(row => row.category);
+          const counts = chartData.map(row => row.count);
+
+          const ctx = document.getElementById('categoryChart').getContext('2d');
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Category Count',
+                data: counts,
+                backgroundColor: '#1474b8'
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: { display: false },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const label = context.label || '';
+                      const value = context.raw || 0;
+                      return `${label}: ${value}`;
+                    }
+                  },
+                  titleFont: {
+                    size: 16 // Increase title font size
+                  },
+                  bodyFont: {
+                    size: 14 // Increase body font size
+                  }
+                }
+              },
+              scales: {
+                x: {
+                  ticks: {
+                    font: {
+                      size: 14, // Font size for x-axis labels
+                      family: 'Arial', // Font family for x-axis labels
+                      weight: 'bold' // Font weight for x-axis labels
+                    },
+                    color: '#3a3a6a' // Color for x-axis labels
+                  },
+                  title: {
+                    display: true,
+                    text: 'Categories', // Title for x-axis
+                    font: {
+                      size: 16, // Font size for x-axis title
+                      family: 'Arial',
+                      weight: 'bold'
+                    },
+                    color: '#163E93'
+                  }
+                },
+                y: {
+                  ticks: {
+                    font: {
+                      size: 18, // Font size for y-axis labels
+                      family: 'Arial', // Font family for y-axis labels
+                      weight: 'bold' // Font weight for y-axis labels
+                    },
+                    color: '#3a3a6a' // Color for y-axis labels
+                  },
+                  title: {
+                    display: true,
+                    text: 'Counts', // Title for y-axis
+                    font: {
+                      size: 18, // Font size for y-axis title
+                      family: 'Arial',
+                      weight: 'bold'
+                    },
+                    color: '#3a3a6a'
+                  }
+                }
+              }
+            }
+          });
+        </script>
+        {% else %}
+        <p>No category data available to display.</p>
+        {% endif %} {% if pie_chart_data and pie_chart_data|length > 0 %}
+        <h2>
+          <span class="modeltime">Top 5 Categories (Pie Chart)</span>
+        </h2>
+        <!-- <pre>{{ pie_chart_data|tojson }}</pre> -->
+        <canvas id="categoryPieChart"></canvas>
+        <script>
+          const pieData = {{ pie_chart_data|tojson }};
+          const pieLabels = pieData.map(row => row.category);
+          const pieCounts = pieData.map(row => row.count);
+          const blueShades = [
+            'rgba(54, 162, 235, 0.15)',
+            'rgba(54, 162, 235, 0.9)',
+            '#30A3DA',
+            '#163E93',
+            '#051C2A'
+          ];
+
+          const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
+          new Chart(pieCtx, {
+            type: 'pie',
+            data: {
+              labels: pieLabels,
+              datasets: [{
+                label: 'Top 5 Category Count',
+                data: pieCounts,
+                backgroundColor: blueShades
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    font: {
+                      size: 40 // Adjust font size for legend
+                    }
+                  }
+                },
+                tooltip: {
+                  callbacks: {
+                    label: function (context) {
+                      const label = context.label || '';
+                      const value = context.raw || 0;
+                      return `${label}: ${value}`;
+                    }
+                  },
+                  titleFont: {
+                    size: 40, // Increase title font size
+                    family: 'Arial', // Font family for title
+                    weight: 'bold' // Font weight for title
+                  },
+                  bodyFont: {
+                    size: 30, // Increase body font size
+                    family: 'Arial', // Font family for body
+                    weight: 'normal' // Font weight for body
+                  }
+                }
+              }
+            }
+          });
+        </script>
+        {% else %}
+        <p>No pie chart data available to display.</p>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    <div class="credits">
+      <p>Made by Komal, Subhav, Sidhant, Prayash</p>
+    </div>
+
+    <script>
+      // Show spinner on form submission
+      document.querySelector("form").addEventListener("submit", function () {
+        document.getElementById("spinner").style.display = "flex";
+      });
+    </script>
+  </body>
+</html>

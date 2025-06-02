@@ -10,3 +10,5 @@ nltk
 faiss-cpu
 watchdog
 python-dotenv
+Flask
+matplotlib

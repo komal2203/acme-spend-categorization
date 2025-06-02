@@ -84,6 +84,9 @@ for _, row in unspsc_df.iterrows():
         'commodity_code': com_c,
         'commodity_title':row_map.get(com_c,{}).get('title'),
     }
+    
+    # Simplified map for dropdown
+    unspsc_dropdown_map = {code: details['commodity_title'] for code, details in unspsc_map.items()}
 
 
 

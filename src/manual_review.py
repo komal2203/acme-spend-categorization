@@ -1,7 +1,8 @@
 ### 3.9 `src/09_manual_review.py`
 import streamlit as st
 import pandas as pd
-from src.taxonomy_service import unspsc_map
+# from src.taxonomy_service import unspsc_map
+from taxonomy_service import unspsc_map
 
 st.set_page_config(page_title='Manual Review')
 st.title('🛠️ Low-Confidence Manual Review')
