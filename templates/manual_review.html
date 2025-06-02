@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manual Review</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div id="loading-indicator" class="manual-review-loading-message">
+      Loading data...
+    </div>
+    <div class="container">
+      <h1>Low-Confidence Manual Review</h1>
+      {% if error %}
+      <div class="error-message">{{ error }}</div>
+      {% endif %}
+      {% if not data %}
+      <p>No records available for manual review.</p>
+      {% else %}
+      <table class="result-table">
+        <thead>
+          <tr>
+            <th>Invoice ID</th>
+            <th>Description</th>
+            <th>Current Code</th>
+            <th>Correct Code</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in data %}
+          <tr>
+            <form method="POST">
+              <td>{{ row.invoice_id }}</td>
+              <td>{{ row.description }}</td>
+              <td>{{ row.commodity_code }}</td>
+              <td>
+                <select name="corrected_code">
+                  {% for code, details in unspsc_map.items() %}
+                  <option value="{{ code }}">
+                    {{ code }} – {{ details['commodity_title'] }}
+                  </option>
+                  {% endfor %}
+                </select>
+              </td>
+              <td>
+                <input
+                  type="hidden"
+                  name="invoice_id"
+                  value="{{ row.invoice_id }}"
+                />
+                <button type="submit" class="save-btn">Save</button>
+              </td>
+            </form>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endif %}
+      {% if download_link %}
+      <div class="manual-review-download-container">
+        <a href="{{ download_link }}" class="manual-review-download-btn"
+          >Download Updated Categorized CSV</a
+        >
+      </div>
+      {% endif %}
+    </div>
+
+    <script>
+      window.addEventListener("load", function () {
+        // Hide the loading indicator
+        document.getElementById("loading-indicator").style.display = "none";
+
+        // Show the main container
+        document.querySelector(".container").style.display = "block";
+      });
+    </script>
+  </body>
+</html>
