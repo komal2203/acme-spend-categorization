@@ -192,11 +192,36 @@ def index():
             )
 
         result_df = pd.read_csv("data/categorized.csv")
+        # Don't modify the source and confidence columns at all
+        confidence_col = 'confidence'  # Use exact column name
+        source_col = 'source'  # Use exact column name
+
+        if confidence_col in result_df.columns and not result_df.empty:
+            # Create a temporary column for pie chart data only
+            temp_df = result_df.copy()
+            temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
+            
+            # Group by both confidence and source using exact column names
+            confidence_counts = temp_df.groupby(['Confidence Rounded', source_col]).size().reset_index(name='count')
+            
+            # Create the final data structure
+            confidence_pie_data = []
+            for _, row in confidence_counts.iterrows():
+                confidence_pie_data.append({
+                    'category': row['Confidence Rounded'],
+                    'count': row['count'],
+                    'source': row[source_col]  # This will be exactly 'Rule' or 'GenAI'
+                })
+        else:
+            confidence_pie_data = []
+
+        # Now prettify other columns for display
         result_df.columns = [prettify_column(c) for c in result_df.columns]
         
         # Remove the Confidence Rounded column if it exists
         if 'Confidence Rounded' in result_df.columns:
             result_df = result_df.drop(columns=['Confidence Rounded'])
+
         # Explicitly rename the two columns
         result_df = result_df.rename(columns={
             "Commodity Title": "UNSPSC\nCategory\nName",
@@ -252,39 +277,6 @@ def index():
             ).to_dict(orient="records")
         else:
             amount_chart_data = []
-
-        # confidence_col = next((c for c in result_df.columns if 'Confidence' in c), None)
-        # if confidence_col and not result_df.empty:
-        #     # Create a temporary column for pie chart data only
-        #     temp_df = result_df.copy()
-        #     temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
-        #     confidence_counts = temp_df['Confidence Rounded'].value_counts().nlargest(5).reset_index()
-        #     conf_val_col = confidence_counts.columns[0]
-        #     conf_count_col = confidence_counts.columns[1]
-        #     confidence_pie_data = (
-        #         confidence_counts.rename(columns={conf_val_col: 'category', conf_count_col: 'count'})
-        #         .to_dict(orient='records')
-        #     )
-        # else:
-        #     confidence_pie_data = []
-
-        confidence_col = next((c for c in result_df.columns if 'Confidence' in c), None)
-        if confidence_col and not result_df.empty:
-            # Create a temporary column for pie chart data only
-            temp_df = result_df.copy()
-            temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
-            # Group by both confidence and source
-            confidence_counts = temp_df.groupby(['Confidence Rounded', 'source']).size().reset_index(name='count')
-            # Create the final data structure
-            confidence_pie_data = []
-            for _, row in confidence_counts.iterrows():
-                confidence_pie_data.append({
-                    'category': row['Confidence Rounded'],
-                    'count': row['count'],
-                    'source': row['source']
-                })
-        else:
-            confidence_pie_data = []
 
         cols_to_remove = [
             'Segment Code', 'Segment Title',
