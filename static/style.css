@@ -401,6 +401,28 @@ button:hover {
   text-align: center;
 }
 
+#categorySearch {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+#categorySelect {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  max-height: 300px;
+}
+
+#categorySelect option {
+  padding: 5px;
+}
+
+#categorySelect optgroup {
+  font-weight: bold;
+  color: #333;
+}
+
 canvas {
   background: #fff;
   border-radius: 8px;
