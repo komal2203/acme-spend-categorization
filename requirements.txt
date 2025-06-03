@@ -1,20 +1,19 @@
    # Core dependencies
-   numpy
-   pandas
-   pyyaml
+   numpy==1.26.4
+   pandas==2.2.0
+   pyyaml==6.0.1
    fuzzywuzzy[speedup]
-   sentence-transformers
-   --find-links https://download.pytorch.org/whl/torch_stable.html
-   torch==2.0.1+cpu
+   sentence-transformers==2.2.2
+   torch==2.1.2+cpu
    openai==0.28
-   nltk
-   faiss-cpu
-   python-dotenv
-   Flask
-   matplotlib
+   nltk==3.8.1
+   faiss-cpu==1.7.4
+   python-dotenv==1.0.0
+   Flask==3.0.2
+   matplotlib==3.8.2
 
    # Database
-   mysql-connector-python
+   mysql-connector-python==8.3.0
 
    # Server
    gunicorn==20.1.0
