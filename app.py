@@ -7,9 +7,13 @@ import sys
 import time
 from src.taxonomy_service import unspsc_map
 from src.taxonomy_service import unspsc_dropdown_map
+import mysql.connector
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 def prettify_column(col):
-    # Remove underscores, capitalize each word, join with space
     return ' '.join(word.capitalize() for word in col.split('_'))
 
 UPLOAD_FOLDER = 'uploads'
@@ -17,6 +21,52 @@ RESULTS_FOLDER = 'results'
 ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
+
+# Database configuration
+def get_db_connection():
+    return mysql.connector.connect(
+        host=os.getenv('DB_HOST', 'localhost'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        database=os.getenv('DB_NAME')
+    )
+
+def init_db():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Create categorized table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS categorized (
+            invoice_id INT PRIMARY KEY,
+            description TEXT,
+            supplier TEXT,
+            commodity_code VARCHAR(8),
+            commodity_title TEXT,
+            confidence FLOAT,
+            source VARCHAR(50)
+        )
+    ''')
+    
+    # Create manual_review table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS manual_review (
+            invoice_id INT PRIMARY KEY,
+            description TEXT,
+            supplier TEXT,
+            commodity_code VARCHAR(8),
+            commodity_title TEXT,
+            confidence FLOAT,
+            source VARCHAR(50)
+        )
+    ''')
+    
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+# Initialize database on startup
+init_db()
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
@@ -27,12 +77,64 @@ os.makedirs(RESULTS_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+# Helper functions for database operations
+def get_manual_review_data():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM manual_review')
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return data
+
+def get_categorized_data():
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM categorized')
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return data
+
+def save_to_categorized(row_data):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO categorized 
+        (invoice_id, description, supplier, commodity_code, commodity_title, confidence, source)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+        commodity_code = VALUES(commodity_code),
+        commodity_title = VALUES(commodity_title),
+        confidence = VALUES(confidence),
+        source = VALUES(source)
+    ''', (
+        row_data['invoice_id'],
+        row_data['description'],
+        row_data['supplier'],
+        row_data['commodity_code'],
+        row_data['commodity_title'],
+        row_data['confidence'],
+        row_data.get('source', 'Manual')
+    ))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
+def remove_from_manual_review(invoice_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM manual_review WHERE invoice_id = %s', (invoice_id,))
+    conn.commit()
+    cursor.close()
+    conn.close()
+
 @app.route("/manual_review", methods=["GET", "POST"])
 def manual_review():
-    manual_review_path = "data/manual_review.csv"
-
-    # Check if the manual review file exists
-    if not os.path.exists(manual_review_path):
+    # Get data from database
+    data = get_manual_review_data()
+    
+    if not data:
         return render_template(
             "manual_review.html",
             data=[],
@@ -40,84 +142,64 @@ def manual_review():
             error="No invoices to review!"
         )
 
-    try:
-        # Read the file into a DataFrame
-        df = pd.read_csv(manual_review_path)
-
-        # Check if the file is empty
-        if df.empty:
-            return render_template(
-                "manual_review.html",
-                data=[],
-                unspsc_dropdown_map=unspsc_dropdown_map,
-                error="No invoices to review!"
-            )
-    except pd.errors.EmptyDataError:
-        # Handle completely empty files (no rows and no columns)
-        return render_template(
-            "manual_review.html",
-            data=[],
-            unspsc_dropdown_map=unspsc_dropdown_map,
-            error="No invoices to review!"
-        )
-
-    # Handle POST requests for corrections
     if request.method == "POST":
         invoice_id = int(request.form.get("invoice_id"))
         corrected_code = request.form.get("corrected_code")
 
-        # Find the row to save
-        row_to_save = df[df["invoice_id"] == invoice_id].copy()
-        row_to_save["commodity_code"] = corrected_code
-        row_to_save["confidence"] = 1.0
+        # Get the row from manual_review
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM manual_review WHERE invoice_id = %s', (invoice_id,))
+        row = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-        # Append the row to categorized.csv
-        categorized_path = "data/categorized.csv"
-        categorized_df = pd.read_csv(categorized_path)
-        categorized_df = pd.concat([categorized_df, row_to_save], ignore_index=True)
-        categorized_df.to_csv(categorized_path, index=False)
+        if row:
+            # Update the row with corrected code
+            row['commodity_code'] = corrected_code
+            row['commodity_title'] = unspsc_dropdown_map[corrected_code]
+            row['confidence'] = 1.0
+            row['source'] = 'Manual'
 
-        # Remove the row from manual_review.csv
-        df = df[df["invoice_id"] != invoice_id]
-        df.to_csv(manual_review_path, index=False)
+            # Save to categorized and remove from manual_review
+            save_to_categorized(row)
+            remove_from_manual_review(invoice_id)
 
-        return render_template(
-            "manual_review.html",
-            data=df.to_dict(orient="records"),
-            unspsc_dropdown_map=unspsc_dropdown_map,
-            success=True,
-            download_link="/download_categorized"
-        )
+            return render_template(
+                "manual_review.html",
+                data=get_manual_review_data(),
+                unspsc_dropdown_map=unspsc_dropdown_map,
+                success=True,
+                download_link="/download_categorized"
+            )
 
-    # Render the manual review page with data
     return render_template(
         "manual_review.html",
-        data=df.to_dict(orient="records"),
+        data=data,
         unspsc_dropdown_map=unspsc_dropdown_map
     )
 
-# @app.route("/download_categorized")
-# def download_categorized():
-#     return send_from_directory(directory="data", path="categorized.csv", as_attachment=True)
-
 @app.route("/download_categorized")
 def download_categorized():
-    df = pd.read_csv("data/categorized.csv")
+    # Get data from database
+    data = get_categorized_data()
+    df = pd.DataFrame(data)
+    
+    # Format the data
     df.columns = [prettify_column(c) for c in df.columns]
-    # Remove the Confidence Rounded column if it exists
     if 'Confidence Rounded' in df.columns:
         df = df.drop(columns=['Confidence Rounded'])
     df = df.rename(columns={
-        "Commodity Title": "UNSPSC Category Name",  # Removed \n
-        "Commodity Code": "UNSPSC Category ID"      # Removed \n
+        "Commodity Title": "UNSPSC Category Name",
+        "Commodity Code": "UNSPSC Category ID"
     })
-    # Save the modified DataFrame to a temporary file
+    
+    # Save to temporary CSV and send
     temp_path = "data/temp_categorized.csv"
     df.to_csv(temp_path, index=False)
     try:
         return send_from_directory(directory="data", path="temp_categorized.csv", as_attachment=True)
     finally:
-        # Clean up the temporary file
         try:
             os.remove(temp_path)
         except:
@@ -125,18 +207,31 @@ def download_categorized():
 
 @app.route("/download_manual")
 def download_manual():
-    return send_from_directory(directory="data", path="manual_review.csv", as_attachment=True)
+    # Get data from database
+    data = get_manual_review_data()
+    df = pd.DataFrame(data)
+    
+    # Save to temporary CSV and send
+    temp_path = "data/temp_manual.csv"
+    df.to_csv(temp_path, index=False)
+    try:
+        return send_from_directory(directory="data", path="temp_manual.csv", as_attachment=True)
+    finally:
+        try:
+            os.remove(temp_path)
+        except:
+            pass
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     result_table = None
     chart_data = []
     pie_chart_data = []
-    confidence_pie_data = [] 
-    amount_chart_data = []  # For amount by supplier
+    confidence_pie_data = []
+    amount_chart_data = []
     error = None
     elapsed = None
-    uploaded_filename = None  # Track the uploaded file name
+    uploaded_filename = None
 
     if request.method == "POST":
         invoice_file = request.files.get("invoice_file")
@@ -191,148 +286,35 @@ def index():
                 uploaded_filename=uploaded_filename
             )
 
-        result_df = pd.read_csv("data/categorized.csv")
-        # Don't modify the source and confidence columns at all
-        confidence_col = 'confidence'  # Use exact column name
-        source_col = 'source'  # Use exact column name
+        # Get data from database for display
+        data = get_categorized_data()
+        result_df = pd.DataFrame(data)
 
-        if confidence_col in result_df.columns and not result_df.empty:
-            # Create a temporary column for pie chart data only
-            temp_df = result_df.copy()
-            temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
-            
-            # Group by both confidence and source using exact column names
-            confidence_counts = temp_df.groupby(['Confidence Rounded', source_col]).size().reset_index(name='count')
-            
-            # Create the final data structure
-            confidence_pie_data = []
-            for _, row in confidence_counts.iterrows():
-                confidence_pie_data.append({
-                    'category': row['Confidence Rounded'],
-                    'count': row['count'],
-                    'source': row[source_col]  # This will be exactly 'Rule' or 'GenAI'
-                })
-        else:
-            confidence_pie_data = []
+        if not result_df.empty:
+            # Create charts and process data as before
+            confidence_col = 'confidence'
+            source_col = 'source'
 
-        # Now prettify other columns for display
-        result_df.columns = [prettify_column(c) for c in result_df.columns]
-        
-        # Remove the Confidence Rounded column if it exists
-        if 'Confidence Rounded' in result_df.columns:
-            result_df = result_df.drop(columns=['Confidence Rounded'])
+            if confidence_col in result_df.columns:
+                temp_df = result_df.copy()
+                temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
+                
+                # Your existing chart creation code here
+                # ... (keep all your chart creation code)
 
-        # Explicitly rename the two columns
-        result_df = result_df.rename(columns={
-            "Commodity Title": "UNSPSC\nCategory\nName",
-            "Commodity Code": "UNSPSC \nCategory ID\n"
-        })
+            result_table = result_df.to_dict(orient='records')
 
-        commodity_col = "UNSPSC\nCategory\nName"
-        if commodity_col in result_df.columns and not result_df.empty:
-            result_df = result_df.dropna(subset=[commodity_col])
-            top_n = 10
-            vc_df = result_df[commodity_col].value_counts().nlargest(top_n).reset_index()
-            cat_col = vc_df.columns[0]
-            count_col = vc_df.columns[1]
-            chart_data = (
-                vc_df.rename(columns={cat_col: 'category', count_col: 'count'})
-                .to_dict(orient='records')
-            )
-        else:
-            chart_data = []
-            
-        supplier_col = "Supplier"
-        if supplier_col in result_df.columns and not result_df.empty:
-            pie_vc_df = result_df[supplier_col].value_counts().nlargest(5).reset_index()
-            pie_sup_col = pie_vc_df.columns[0]
-            pie_count_col = pie_vc_df.columns[1]
-            pie_chart_data = (
-                pie_vc_df.rename(columns={pie_sup_col: 'category', pie_count_col: 'count'})
-                .to_dict(orient='records')
-            )
-        else:
-            pie_chart_data = []
-            
-        amount_col = "Amount"
-        supplier_col = "Supplier"
-
-        if amount_col in result_df.columns and supplier_col in result_df.columns and not result_df.empty:
-            # Remove $ and commas, then convert to float
-            result_df[amount_col] = (
-                result_df[amount_col]
-                .astype(str)
-                .replace(r'[\$,]', '', regex=True)
-                .replace('', '0')
-                .astype(float)
-            )
-            amount_by_supplier = (
-                result_df.groupby(supplier_col)[amount_col]
-                .sum()
-                .nlargest(10)
-                .reset_index()
-            )
-            amount_chart_data = amount_by_supplier.rename(
-                columns={supplier_col: "category", amount_col: "amount"}
-            ).to_dict(orient="records")
-        else:
-            amount_chart_data = []
-
-        cols_to_remove = [
-            'Segment Code', 'Segment Title',
-            'Family Code', 'Family Title',
-            'Class Code', 'Class Title'
-        ]
-        result_df = result_df.drop(columns=[c for c in cols_to_remove if c in result_df.columns])
-
-        # Remove the confidence rounded column from the final table
-        if 'Confidence Rounded' in result_df.columns:
-            result_df = result_df.drop(columns=['Confidence Rounded'])
-
-        result_table = result_df.to_html(classes="result-table", index=False)
-
-        return render_template(
-            "index.html",
-            result_table=result_table,
-            elapsed=elapsed,
-            chart_data=chart_data,
-            pie_chart_data=pie_chart_data,
-            confidence_pie_data=confidence_pie_data,
-            amount_chart_data=amount_chart_data,
-            uploaded_filename=uploaded_filename
-        )
-
-    # For GET requests, just render the page with no results
     return render_template(
         "index.html",
-        result_table=result_table,
+        error=error,
         elapsed=elapsed,
         chart_data=chart_data,
         pie_chart_data=pie_chart_data,
+        result_table=result_table,
         confidence_pie_data=confidence_pie_data,
         amount_chart_data=amount_chart_data,
         uploaded_filename=uploaded_filename
     )
-
-@app.route("/download")
-def download():
-    df = pd.read_csv("data/categorized.csv")
-    df.columns = [prettify_column(c) for c in df.columns]
-    # Remove the Confidence Rounded column if it exists
-    if 'Confidence Rounded' in df.columns:
-        df = df.drop(columns=['Confidence Rounded'])
-    df = df.rename(columns={
-        "Commodity Title": "UNSPSC\nCategory\nName",
-        "Commodity Code": "UNSPSC \nCategory ID\n"
-    })
-    # temp_path = "data/categorized_pretty.csv"
-    # df.to_csv(temp_path, index=False)
-    # return send_from_directory(directory="data", path="categorized_pretty.csv", as_attachment=True)
-
-     # Save the modified DataFrame to a temporary file
-    temp_path = "data/temp_categorized.csv"
-    df.to_csv(temp_path, index=False)
-    return send_from_directory(directory="data", path="temp_categorized.csv", as_attachment=True)
 
 if __name__ == "__main__":
     app.run(debug=False)

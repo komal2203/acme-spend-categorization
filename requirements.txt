@@ -1,18 +1,24 @@
+# Core dependencies
 numpy
 pandas
 pyyaml
 fuzzywuzzy[speedup]
 sentence-transformers
 torch
-openai
-streamlit
-schedule
+openai==0.28
 nltk
 faiss-cpu
-watchdog
 python-dotenv
 Flask
 matplotlib
-openai==0.28
-schedule==1.1.0
+
+# Database
+mysql-connector-python
+
+# Server
 gunicorn==20.1.0
+
+# Remove these as they're not needed for web deployment
+# streamlit (not needed for Flask web app)
+# schedule (not needed for web deployment)
+# watchdog (not needed for web deployment)
