@@ -1,141 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Spend Categorization</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Spend Categorization</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1"></script>
+  <script>
+    Chart.register({
+      id: "whiteBackground",
+      beforeDraw: function (chart) {
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.restore();
+      },
+    });
+
+    // Add initial loader script
+    window.addEventListener('load', function () {
+      const initialLoader = document.getElementById('initial-loader');
+      initialLoader.style.display = 'none';
+    });
+  </script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+  <!-- Initial loader -->
+  <div id="initial-loader" class="spinner">
+    <div class="loader"></div>
+    <div class="spinner-text">Loading Dashboard...</div>
+  </div>
+
+  <!-- Spinner overlay for file processing -->
+  <div id="spinner" class="spinner" style="display: none">
+    <div class="loader"></div>
+    <div class="spinner-text">Processing, please wait...</div>
+  </div>
+  <div class="container">
+    <img src="{{ url_for('static', filename='mck1.png') }}" alt="Dashboard Image" style="height: 60px; width: 215px" />
+    <h1>📄 Spend Categorization Dashboard</h1>
+    <form class="inputcontainer" method="post" enctype="multipart/form-data">
+      <label><span class="modeltime"> Upload Invoice CSV:</span></label>
+      <div class="fileupload">
+        <input type="file" name="invoice_file" accept=".csv" required />
+        <button type="submit">Run Model</button>
+      </div>
+      {% if elapsed is not none %}
+      <label>
+        <span class="modeltime">Model Categorization Time:</span> {{
+        "%.2f"|format(elapsed) }} seconds
+      </label>
+      {% endif %}
+    </form>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %} {% if error %}
     <script>
-      Chart.register({
-        id: "whiteBackground",
-        beforeDraw: function (chart) {
-          const ctx = chart.ctx;
-          ctx.save();
-          ctx.globalCompositeOperation = "destination-over";
-          ctx.fillStyle = "#fff";
-          ctx.fillRect(0, 0, chart.width, chart.height);
-          ctx.restore();
-        },
-      });
-
-      // Add initial loader script
-      window.addEventListener('load', function() {
-        const initialLoader = document.getElementById('initial-loader');
-        initialLoader.style.display = 'none';
-      });
+      window.onload = function () {
+        alert("{{ error }}");
+      };
     </script>
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
-    />
-  </head>
-  <body>
-    <!-- Initial loader -->
-    <div id="initial-loader" class="spinner">
-      <div class="loader"></div>
-      <div class="spinner-text">Loading Dashboard...</div>
-    </div>
-
-    <!-- Spinner overlay for file processing -->
-    <div id="spinner" class="spinner" style="display: none">
-      <div class="loader"></div>
-      <div class="spinner-text">Processing, please wait...</div>
-    </div>
-    <div class="container">
-      <img
-        src="{{ url_for('static', filename='mck1.png') }}"
-        alt="Dashboard Image"
-        style="height: 60px; width: 215px"
-      />
-      <h1>📄 Spend Categorization Dashboard</h1>
-      <form class="inputcontainer" method="post" enctype="multipart/form-data">
-        <label><span class="modeltime"> Upload Invoice CSV:</span></label>
-        <div class="fileupload">
-          <input type="file" name="invoice_file" accept=".csv" required />
-          <button type="submit">Run Model</button>
+    {% endif %} {% if result_table %}
+    <div class="outputcontainer">
+      {% if uploaded_filename %}
+      <label>
+        <span class="modeltime">File processed: </span> {{ uploaded_filename }}
+      </label>
+      <div class="resulttitle">
+        <h2>
+          <span class="modeltime">Results Table</span>
+        </h2>
+        <div class="buttonsdiv">
+          <a href="{{ url_for('download_manual') }}" class="download-btn">Download Manual Review CSV</a>
+          <a href="{{ url_for('download') }}" class="download-btn">Download Categorized Output</a>
         </div>
-        {% if elapsed is not none %}
-        <label>
-          <span class="modeltime">Model Categorization Time:</span> {{
-          "%.2f"|format(elapsed) }} seconds
-        </label>
-        {% endif %}
-      </form>
+      </div>
 
-      {% if error %}
-      <div class="error">{{ error }}</div>
-      {% endif %} {% if error %}
+      {% endif %}
+      <div class="table-container">{{ result_table|safe }}</div>
+
+      <div class="manual-review-container">
+        <a href="{{ url_for('manual_review') }}" class="manual-review-btn">Go to Manual Review</a>
+      </div>
+
+      {% if chart_data and chart_data|length > 0 %}
+      <div class="resulttitle">
+        <h2>
+          <span class="modeltime">Category Distribution - Top 10</span>
+        </h2>
+        <button id="downloadBarChart" class="download-btn" type="button">
+          Download Bar Chart
+        </button>
+      </div>
+
+      <canvas id="categoryChart" width="400" height="200"></canvas>
       <script>
-        window.onload = function () {
-          alert("{{ error }}");
-        };
-      </script>
-      {% endif %} {% if result_table %}
-      <div class="outputcontainer">
-        {% if uploaded_filename %}
-        <label>
-          <span class="modeltime">File processed: </span>{{ uploaded_filename }}
-        </label>
-        <div class="resulttitle">
-          <h2>
-            <span class="modeltime">Results Table</span>
-          </h2>
-          <div class="buttonsdiv">
-            <a href="{{ url_for('download_manual') }}" class="download-btn"
-              >Download Manual Review CSV</a
-            >
-            <a href="{{ url_for('download') }}" class="download-btn"
-              >Download Categorized Output</a
-            >
-          </div>
-        </div>
+        const chartData = {{ chart_data| tojson }};
+        const labels = chartData.map(row => row.category);
+        const counts = chartData.map(row => row.count);
 
-        {% endif %}
-        <div class="table-container">{{ result_table|safe }}</div>
-
-        <div class="manual-review-container">
-          <a href="{{ url_for('manual_review') }}" class="manual-review-btn"
-            >Go to Manual Review</a
-          >
-        </div>
-
-        {% if chart_data and chart_data|length > 0 %}
-        <div class="resulttitle">
-          <h2>
-            <span class="modeltime">Category Distribution - Top 10</span>
-          </h2>
-          <button id="downloadBarChart" class="download-btn" type="button">
-            Download Bar Chart
-          </button>
-        </div>
-
-        <canvas id="categoryChart" width="400" height="200"></canvas>
-        <script>
-          const chartData = {{ chart_data|tojson }};
-          const labels = chartData.map(row => row.category);
-          const counts = chartData.map(row => row.count);
-
-          const ctx = document.getElementById('categoryChart').getContext('2d');
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Category Count',
-                data: counts,
-                backgroundColor: '#1474b8'
-              }]
+        const ctx = document.getElementById('categoryChart').getContext('2d');
+        new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: labels,
+            datasets: [{
+              label: 'Category Count',
+              data: counts,
+              backgroundColor: '#1474b8'
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    return `${label}: ${value}`;
+                  }
+                },
+                titleFont: {
+                  size: 18
+                },
+                bodyFont: {
+                  size: 16
+                }
+              }
             },
-            options: {
-              responsive: true,            
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const label = context.label || '';
-                      const value = context.raw || 0;
-                      return `${label}: ${value}`;
-                    }
+            scales: {
+              x: {
+                ticks: {
+                  font: {
+                    size: 15,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#3a3a6a'
+                },
+                title: {
+                  display: true,
+                  text: 'UNSPSC Category Name',
+                  font: {
+                    size: 22,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#3a3a6a'
+                }
+              },
+              y: {
+                ticks: {
+                  font: {
+                    size: 16,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#3a3a6a'
+                },
+                title: {
+                  display: true,
+                  text: 'Counts',
+                  font: {
+                    size: 22,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#3a3a6a'
+                }
+              }
+            }
+          }
+        });
+      </script>
+      {% else %}
+      <p>No category data available to display.</p>
+      {% endif %}{% if amount_chart_data and amount_chart_data|length > 0 %}
+      <div class="resulttitle">
+        <h2>
+          <span class="modeltime">Suppliers by Amount Distribution - Top 10</span>
+        </h2>
+        <button id="downloadAmountBarChart" class="download-btn" type="button">
+          Download Amount Bar Chart
+        </button>
+      </div>
+      <canvas id="amountBarChart" width="400" height="200"></canvas>
+      <script>
+        const amountData = {{ amount_chart_data| tojson }};
+        const amountLabels = amountData.map(row => row.category);
+        const amountValues = amountData.map(row => row.amount);
+
+        const amountBarCtx = document.getElementById('amountBarChart').getContext('2d');
+        new Chart(amountBarCtx, {
+          type: 'bar',
+          data: {
+            labels: amountLabels,
+            datasets: [{
+              label: 'Total Amount',
+              data: amountValues,
+              backgroundColor: '#30A3DA '
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    return `${label}: ${value}`;
                   },
                   titleFont: {
                     size: 18 // Increase title font size
@@ -144,401 +225,301 @@
                     size: 16 // Increase body font size
                   }
                 }
-              },
-              scales: {
-                x: {
-                  ticks: {
-                    font: {
-                      size: 15, // Font size for x-axis labels
-                      family: 'Arial', // Font family for x-axis labels
-                      weight: 'bold' // Font weight for x-axis labels
-                    },
-                    color: '#3a3a6a' // Color for x-axis labels
-                  },
-                  title: {
-                    display: true,
-                    text: 'UNSPSC Category Name',
-                    font: {
-                      size: 22,
-                      family: 'Arial',
-                      weight: 'bold'
-                    },
-                    color: '#3a3a6a'
-                  }
-                },
-                y: {
-                  ticks: {
-                    font: {
-                      size: 16, // Font size for y-axis labels
-                      family: 'Arial', // Font family for y-axis labels
-                      weight: 'bold' // Font weight for y-axis labels
-                    },
-                    color: '#3a3a6a' // Color for y-axis labels
-                  },
-                  title: {
-                    display: true,
-                    text: 'Counts', // Title for y-axis
-                    font: {
-                      size: 22, // Font size for y-axis title
-                      family: 'Arial',
-                      weight: 'bold'
-                    },
-                    color: '#3a3a6a'
-                  }
-                }
               }
-            }
-          });
-        </script>
-        {% else %}
-        <p>No category data available to display.</p>
-        {% endif %}{% if amount_chart_data and amount_chart_data|length > 0 %}
-        <div class="resulttitle">
-          <h2>
-            <span class="modeltime"
-              >Suppliers by Amount Distribution - Top 10</span
-            >
-          </h2>
-          <button
-            id="downloadAmountBarChart"
-            class="download-btn"
-            type="button"
-          >
-            Download Amount Bar Chart
-          </button>
-        </div>
-        <canvas id="amountBarChart" width="400" height="200"></canvas>
-        <script>
-          const amountData = {{ amount_chart_data|tojson }};
-          const amountLabels = amountData.map(row => row.category);
-          const amountValues = amountData.map(row => row.amount);
-
-          const amountBarCtx = document.getElementById('amountBarChart').getContext('2d');
-          new Chart(amountBarCtx, {
-            type: 'bar',
-            data: {
-              labels: amountLabels,
-              datasets: [{
-                label: 'Total Amount',
-                data: amountValues,
-                backgroundColor: '#30A3DA '
-              }]
             },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: { display: false },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const label = context.label || '';
-                      const value = context.raw || 0;
-                      return `${label}: ${value}`;
-                    },
-                    titleFont: {
-                      size: 18 // Increase title font size
-                    },
-                    bodyFont: {
-                      size: 16 // Increase body font size
-                    }
-                  }
+            scales: {
+              x: {
+                ticks: {
+                  font: {
+                    size: 15, // Font size for x-axis labels
+                    family: 'Arial', // Font family for x-axis labels
+                    weight: 'bold' // Font weight for x-axis labels
+                  },
+                  color: '#3a3a6a' // Color for x-axis labels
+                },
+                title: {
+                  display: true,
+                  text: 'Spend Amount ($)',
+                  font: {
+                    size: 22,
+                    family: 'Arial',
+                    weight: 'bold'
+                  },
+                  color: '#3a3a6a'
                 }
               },
-              scales: {
-                x: {
-                  ticks: {
-                    font: {
-                      size: 15, // Font size for x-axis labels
-                      family: 'Arial', // Font family for x-axis labels
-                      weight: 'bold' // Font weight for x-axis labels
-                    },
-                    color: '#3a3a6a' // Color for x-axis labels
+              y: {
+                ticks: {
+                  font: {
+                    size: 16, // Font size for y-axis labels
+                    family: 'Arial', // Font family for y-axis labels
+                    weight: 'bold' // Font weight for y-axis labels
                   },
-                  title: {
-                    display: true,
-                    text: 'Spend Amount ($)',
-                    font: {
-                      size: 22,
-                      family: 'Arial',
-                      weight: 'bold'
-                    },
-                    color: '#3a3a6a'
-                  }
+                  color: '#3a3a6a' // Color for y-axis labels
                 },
-                y: {
-                  ticks: {
-                    font: {
-                      size: 16, // Font size for y-axis labels
-                      family: 'Arial', // Font family for y-axis labels
-                      weight: 'bold' // Font weight for y-axis labels
-                    },
-                    color: '#3a3a6a' // Color for y-axis labels
-                  },
-                  title: {
-                    display: true,
-                    text: 'Supplier', // Title for y-axis
-                    font: {
-                      size: 22, // Font size for y-axis title
-                      family: 'Arial',
-                      weight: 'bold'
-                    },
-                    color: '#3a3a6a'
-                  }
-                }
-              }
-            }
-          });
-        </script>
-        {% else %}
-        <p>No amount data available to display.</p>
-        {% endif %} {% if pie_chart_data and pie_chart_data|length > 0 %}
-        <div class="resulttitle">
-          <h2>
-            <span class="modeltime">Supplier Distribution - Top 5</span>
-          </h2>
-          <button id="downloadPieChart" class="download-btn" type="button">
-            Download Pie Chart
-          </button>
-        </div>
-
-        <!-- <pre>{{ pie_chart_data|tojson }}</pre> -->
-        <!-- <canvas id="categoryPieChart"></canvas> -->
-        <!-- Supplier Pie Chart with Related Content -->
-        <div class="chart-with-info">
-          <div class="chart-canvas">
-            <canvas id="categoryPieChart"></canvas>
-          </div>
-          <div class="chart-info">
-            <h3>About Supplier Distribution</h3>
-            <p>
-              This pie chart shows the distribution of the top 5 suppliers based
-              on the number of transactions in the uploaded data.
-              <br /><br />
-              <strong>How to use:</strong> Hover over each segment to see the
-              supplier name and count. This helps identify which suppliers are
-              most frequently used.
-            </p>
-            <ul>
-              <li>
-                Shows the five suppliers with the highest transaction counts.
-              </li>
-              <li>The legend links each color to a specific supplier.</li>
-              <li>Download the chart for reporting or further analysis.</li>
-            </ul>
-          </div>
-        </div>
-        <script>
-          const pieData = {{ pie_chart_data|tojson }};
-          const pieLabels = pieData.map(row => row.category);
-          const pieCounts = pieData.map(row => row.count);
-          const blueShades = [
-            'rgba(54, 162, 235, 0.15)',
-            'rgba(54, 162, 235, 0.9)',
-            '#30A3DA',
-            '#163E93',
-            '#051C2A'
-          ];
-
-          const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
-          new Chart(pieCtx, {
-            type: 'pie',
-            data: {
-              labels: pieLabels,
-              datasets: [{
-                label: 'Top 5 Category Count',
-                data: pieCounts,
-                backgroundColor: blueShades
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
+                title: {
                   display: true,
-                  labels: {
-                    font: {
-                      size: 30 // Adjust font size for legend
-                    }
-                  }
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const label = context.label || '';
-                      const value = context.raw || 0;
-                      return `${label}: ${value}`;
-                    }
+                  text: 'Supplier', // Title for y-axis
+                  font: {
+                    size: 22, // Font size for y-axis title
+                    family: 'Arial',
+                    weight: 'bold'
                   },
-                  titleFont: {
-                    size: 30, // Increase title font size
-                    family: 'Arial', // Font family for title
-                    weight: 'bold' // Font weight for title
-                  },
-                  bodyFont: {
-                    size: 20, // Increase body font size
-                    family: 'Arial', // Font family for body
-                    weight: 'normal' // Font weight for body
-                  }
+                  color: '#3a3a6a'
                 }
               }
             }
-          });
-        </script>
-        {% else %}
-        <p>No pie chart data available to display.</p>
-        {% endif %} {% if confidence_pie_data and confidence_pie_data|length > 0
-        %}
-        <div class="resulttitle">
-          <h2>
-            <span class="modeltime">Confidence Distribution - Top 5</span>
-          </h2>
-          <button
-            id="downloadConfidencePieChart"
-            class="download-btn"
-            type="button"
-          >
-            Download Confidence Pie Chart
-          </button>
-        </div>
-        <!-- <canvas id="confidencePieChart"></canvas> -->
-        <!-- Confidence Pie Chart with Related Content -->
-        <div class="chart-with-info">
-          <div class="chart-canvas">
-            <canvas id="confidencePieChart"></canvas>
-          </div>
-          <div class="chart-info">
-            <h3>About Confidence Distribution</h3>
-            <p>
-              This pie chart visualizes the distribution of the top 5 most
-              frequent confidence scores assigned by the model during
-              categorization.
-              <br /><br />
-              <strong>How to use:</strong> Hover over each segment to see the
-              confidence value and its count. This helps you understand how
-              certain the model was for most predictions.
-            </p>
-            <ul>
-              <li>
-                Higher confidence values reflect stronger model certainty in its
-                predictions.
-              </li>
-              <li>
-                The legend links each color to a specific confidence score.
-              </li>
-              <li>Download the chart for reporting or further analysis.</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="confidence-details">
-          <h3>Confidence Distribution Details</h3>
-          <div class="confidence-stats">
-            <table class="confidence-table">
-              <thead>
-                <tr>
-                  <th>Confidence Score</th>
-                  <th>Count</th>
-                  <th>Percentage</th>
-                  <th>Interpretation</th>
-                  <th>Prediction Method</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for item in confidence_pie_data %}
-                <tr>
-                  <td>{{ item.category }}</td>
-                  <td>{{ item.count }}</td>
-                  <td>{{ "%.1f"|format(item.count / confidence_pie_data|sum(attribute='count') * 100) }}%</td>
-                  <td>
-                    {% if item.category|float >= 0.9 %}
-                      Very High Confidence
-                    {% elif item.category|float >= 0.7 %}
-                      High Confidence
-                    {% elif item.category|float >= 0.5 %}
-                      Moderate Confidence
-                    {% elif item.category|float >= 0.3 %}
-                      Low Confidence
-                    {% else %}
-                      Very Low Confidence
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if item.category|float >= 0.85 %}
-                      <span class="genai-method">GenAI</span>
-                    {% else %}
-                      <span class="rules-method">Rules</span>
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        </div>
-        <script>
-          const confidencePieData = {{ confidence_pie_data|tojson }};
-          const confLabels = confidencePieData.map(row => row.category);
-          const confCounts = confidencePieData.map(row => row.count);
-          const confColors = [
-            '#30A3DA', '#163E93', '#051C2A', '#1474b8', '#3a3a6a'
-          ];
-
-          const confPieCtx = document.getElementById('confidencePieChart').getContext('2d');
-          new Chart(confPieCtx, {
-            type: 'pie',
-            data: {
-              labels: confLabels,
-              datasets: [{
-                label: 'Confidence Distribution',
-                data: confCounts,
-                backgroundColor: confColors
-              }]
-            },
-            options: {
-              responsive: true,
-              plugins: {
-                legend: {
-                  display: true,
-                  labels: {
-                    font: {
-                      size: 30
-                    }
-                  }
-                },
-                tooltip: {
-                  callbacks: {
-                    label: function (context) {
-                      const label = context.label || '';
-                      const value = context.raw || 0;
-                      return `${label}: ${value}`;
-                    }
-                  },
-                  titleFont: {
-                    size: 30, // Increase title font size
-                    family: 'Arial', // Font family for title
-                    weight: 'bold' // Font weight for title
-                  },
-                  bodyFont: {
-                    size: 20, // Increase body font size
-                    family: 'Arial', // Font family for body
-                    weight: 'normal' // Font weight for body
-                  }
-                }
-              }
-            }
-          });
-        </script>
-        {% else %}
-        <p>No confidence data available to display.</p>
-        {% endif %}
+          }
+        });
+      </script>
+      {% else %}
+      <p>No amount data available to display.</p>
+      {% endif %} {% if pie_chart_data and pie_chart_data|length > 0 %}
+      <div class="resulttitle">
+        <h2>
+          <span class="modeltime">Supplier Distribution - Top 5</span>
+        </h2>
+        <button id="downloadPieChart" class="download-btn" type="button">
+          Download Pie Chart
+        </button>
       </div>
+
+      <!-- <pre>{{ pie_chart_data|tojson }}</pre> -->
+      <!-- <canvas id="categoryPieChart"></canvas> -->
+      <!-- Supplier Pie Chart with Related Content -->
+      <div class="chart-with-info">
+        <div class="chart-canvas">
+          <canvas id="categoryPieChart"></canvas>
+        </div>
+        <div class="chart-info">
+          <h3>About Supplier Distribution</h3>
+          <p>
+            This pie chart shows the distribution of the top 5 suppliers based
+            on the number of transactions in the uploaded data.
+            <br /><br />
+            <strong>How to use:</strong> Hover over each segment to see the
+            supplier name and count. This helps identify which suppliers are
+            most frequently used.
+          </p>
+          <ul>
+            <li>
+              Shows the five suppliers with the highest transaction counts.
+            </li>
+            <li>The legend links each color to a specific supplier.</li>
+            <li>Download the chart for reporting or further analysis.</li>
+          </ul>
+        </div>
+      </div>
+      <script>
+        const pieData = {{ pie_chart_data| tojson }};
+        const pieLabels = pieData.map(row => row.category);
+        const pieCounts = pieData.map(row => row.count);
+        const blueShades = [
+          'rgba(54, 162, 235, 0.15)',
+          'rgba(54, 162, 235, 0.9)',
+          '#30A3DA',
+          '#163E93',
+          '#051C2A'
+        ];
+
+        const pieCtx = document.getElementById('categoryPieChart').getContext('2d');
+        new Chart(pieCtx, {
+          type: 'pie',
+          data: {
+            labels: pieLabels,
+            datasets: [{
+              label: 'Top 5 Category Count',
+              data: pieCounts,
+              backgroundColor: blueShades
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  font: {
+                    size: 30 // Adjust font size for legend
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    return `${label}: ${value}`;
+                  }
+                },
+                titleFont: {
+                  size: 30, // Increase title font size
+                  family: 'Arial', // Font family for title
+                  weight: 'bold' // Font weight for title
+                },
+                bodyFont: {
+                  size: 20, // Increase body font size
+                  family: 'Arial', // Font family for body
+                  weight: 'normal' // Font weight for body
+                }
+              }
+            }
+          }
+        });
+      </script>
+      {% else %}
+      <p>No pie chart data available to display.</p>
+      {% endif %} {% if confidence_pie_data and confidence_pie_data|length > 0
+      %}
+      <div class="resulttitle">
+        <h2>
+          <span class="modeltime">Confidence Distribution - Top 5</span>
+        </h2>
+        <button id="downloadConfidencePieChart" class="download-btn" type="button">
+          Download Confidence Pie Chart
+        </button>
+      </div>
+      <!-- <canvas id="confidencePieChart"></canvas> -->
+      <!-- Confidence Pie Chart with Related Content -->
+      <div class="chart-with-info">
+        <div class="chart-canvas">
+          <canvas id="confidencePieChart"></canvas>
+        </div>
+        <div class="chart-info">
+          <h3>About Confidence Distribution</h3>
+          <p>
+            This pie chart visualizes the distribution of the top 5 most
+            frequent confidence scores assigned by the model during
+            categorization.
+            <br /><br />
+            <strong>How to use:</strong> Hover over each segment to see the
+            confidence value and its count. This helps you understand how
+            certain the model was for most predictions.
+          </p>
+          <ul>
+            <li>
+              Higher confidence values reflect stronger model certainty in its
+              predictions.
+            </li>
+            <li>
+              The legend links each color to a specific confidence score.
+            </li>
+            <li>Download the chart for reporting or further analysis.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="confidence-details">
+        <h3>Confidence Distribution Details</h3>
+        <div class="confidence-stats">
+          <table class="confidence-table">
+            <thead>
+              <tr>
+                <th>Confidence Score</th>
+                <th>Count</th>
+                <th>Percentage</th>
+                <th>Interpretation</th>
+                <th>Prediction Method</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in confidence_pie_data %}
+              <tr>
+                <td>{{ item.category }}</td>
+                <td>{{ item.count }}</td>
+                <td>{{ "%.1f"|format(item.count / confidence_pie_data|sum(attribute='count') * 100) }}%</td>
+                <td>
+                  {% if item.category|float >= 0.9 %}
+                  Very High Confidence
+                  {% elif item.category|float >= 0.7 %}
+                  High Confidence
+                  {% elif item.category|float >= 0.5 %}
+                  Moderate Confidence
+                  {% elif item.category|float >= 0.3 %}
+                  Low Confidence
+                  {% else %}
+                  Very Low Confidence
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.source == 'Rule' %}
+                    <span class="rules-method">Business Rule</span>
+                  {% elif item.source == 'GenAI' %}
+                    <span class="genai-method">GenAI</span>
+                  {% else %}
+                    <span class="rules-method">Rules</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <script>
+        const confidencePieData = {{ confidence_pie_data| tojson }};
+        const confLabels = confidencePieData.map(row => row.category);
+        const confCounts = confidencePieData.map(row => row.count);
+        const confColors = [
+          '#30A3DA', '#163E93', '#051C2A', '#1474b8', '#3a3a6a'
+        ];
+
+        const confPieCtx = document.getElementById('confidencePieChart').getContext('2d');
+        new Chart(confPieCtx, {
+          type: 'pie',
+          data: {
+            labels: confLabels,
+            datasets: [{
+              label: 'Confidence Distribution',
+              data: confCounts,
+              backgroundColor: confColors
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  font: {
+                    size: 30
+                  }
+                }
+              },
+              tooltip: {
+                callbacks: {
+                  label: function (context) {
+                    const label = context.label || '';
+                    const value = context.raw || 0;
+                    return `${label}: ${value}`;
+                  }
+                },
+                titleFont: {
+                  size: 30, // Increase title font size
+                  family: 'Arial', // Font family for title
+                  weight: 'bold' // Font weight for title
+                },
+                bodyFont: {
+                  size: 20, // Increase body font size
+                  family: 'Arial', // Font family for body
+                  weight: 'normal' // Font weight for body
+                }
+              }
+            }
+          }
+        });
+      </script>
+      {% else %}
+      <p>No confidence data available to display.</p>
       {% endif %}
     </div>
-    <div class="credits">
-      <p>Made by Subhav, Sidhant, Prayash, Komal</p>
-    </div>
+    {% endif %}
+  </div>
+  <div class="credits">
+    <p>Made by Subhav • Sidhant • Prayash • Komal © 2025</p>
+  </div>
 
-    <!-- <script>
+  <!-- <script>
       // Show spinner on form submission
       document.querySelector("form").addEventListener("submit", function () {
         document.getElementById("spinner").style.display = "flex";
@@ -556,69 +537,70 @@
         }
       });
     </script> -->
-    <script>
-      document.querySelector("form").addEventListener("submit", function (e) {
-        var fileInput = document.querySelector('input[type="file"]');
-        if (fileInput && fileInput.files.length > 0) {
-          var fileName = fileInput.files[0].name;
-          if (!fileName.endsWith(".csv")) {
-            alert("Only CSV files are supported!");
-            e.preventDefault(); // Prevent form submission
-            return; // Do not show spinner
-          }
+  <script>
+    document.querySelector("form").addEventListener("submit", function (e) {
+      var fileInput = document.querySelector('input[type="file"]');
+      if (fileInput && fileInput.files.length > 0) {
+        var fileName = fileInput.files[0].name;
+        if (!fileName.endsWith(".csv")) {
+          alert("Only CSV files are supported!");
+          e.preventDefault(); // Prevent form submission
+          return; // Do not show spinner
         }
-        // Only show spinner if form is actually being submitted
-        document.getElementById("spinner").style.display = "flex";
+      }
+      // Only show spinner if form is actually being submitted
+      document.getElementById("spinner").style.display = "flex";
+    });
+  </script>
+  <script>
+    // Bar Chart Download
+    document
+      .getElementById("downloadBarChart")
+      .addEventListener("click", function () {
+        const chartCanvas = document.getElementById("categoryChart");
+        const url = chartCanvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "bar_chart.png";
+        link.click();
       });
-    </script>
-    <script>
-      // Bar Chart Download
-      document
-        .getElementById("downloadBarChart")
-        .addEventListener("click", function () {
-          const chartCanvas = document.getElementById("categoryChart");
-          const url = chartCanvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "bar_chart.png";
-          link.click();
-        });
 
-      // Pie Chart Download
-      document
-        .getElementById("downloadPieChart")
-        .addEventListener("click", function () {
-          const chartCanvas = document.getElementById("categoryPieChart");
-          const url = chartCanvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "pie_chart.png";
-          link.click();
-        });
-    </script>
-    <script>
-      document
-        .getElementById("downloadConfidencePieChart")
-        .addEventListener("click", function () {
-          const chartCanvas = document.getElementById("confidencePieChart");
-          const url = chartCanvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "confidence_pie_chart.png";
-          link.click();
-        });
-    </script>
-    <script>
-      document
-        .getElementById("downloadAmountBarChart")
-        .addEventListener("click", function () {
-          const chartCanvas = document.getElementById("amountBarChart");
-          const url = chartCanvas.toDataURL("image/png");
-          const link = document.createElement("a");
-          link.href = url;
-          link.download = "amount_bar_chart.png";
-          link.click();
-        });
-    </script>
-  </body>
+    // Pie Chart Download
+    document
+      .getElementById("downloadPieChart")
+      .addEventListener("click", function () {
+        const chartCanvas = document.getElementById("categoryPieChart");
+        const url = chartCanvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "pie_chart.png";
+        link.click();
+      });
+  </script>
+  <script>
+    document
+      .getElementById("downloadConfidencePieChart")
+      .addEventListener("click", function () {
+        const chartCanvas = document.getElementById("confidencePieChart");
+        const url = chartCanvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "confidence_pie_chart.png";
+        link.click();
+      });
+  </script>
+  <script>
+    document
+      .getElementById("downloadAmountBarChart")
+      .addEventListener("click", function () {
+        const chartCanvas = document.getElementById("amountBarChart");
+        const url = chartCanvas.toDataURL("image/png");
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "amount_bar_chart.png";
+        link.click();
+      });
+  </script>
+</body>
+
 </html>
