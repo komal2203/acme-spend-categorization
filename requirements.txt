@@ -12,3 +12,4 @@ watchdog
 python-dotenv
 Flask
 matplotlib
+openai==0.28

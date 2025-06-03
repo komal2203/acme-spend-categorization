@@ -417,6 +417,52 @@
             </ul>
           </div>
         </div>
+
+        <div class="confidence-details">
+          <h3>Confidence Distribution Details</h3>
+          <div class="confidence-stats">
+            <table class="confidence-table">
+              <thead>
+                <tr>
+                  <th>Confidence Score</th>
+                  <th>Count</th>
+                  <th>Percentage</th>
+                  <th>Interpretation</th>
+                  <th>Prediction Method</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in confidence_pie_data %}
+                <tr>
+                  <td>{{ item.category }}</td>
+                  <td>{{ item.count }}</td>
+                  <td>{{ "%.1f"|format(item.count / confidence_pie_data|sum(attribute='count') * 100) }}%</td>
+                  <td>
+                    {% if item.category|float >= 0.9 %}
+                      Very High Confidence
+                    {% elif item.category|float >= 0.7 %}
+                      High Confidence
+                    {% elif item.category|float >= 0.5 %}
+                      Moderate Confidence
+                    {% elif item.category|float >= 0.3 %}
+                      Low Confidence
+                    {% else %}
+                      Very Low Confidence
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if item.category|float >= 0.85 %}
+                      <span class="genai-method">GenAI</span>
+                    {% else %}
+                      <span class="rules-method">Rules</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
         <script>
           const confidencePieData = {{ confidence_pie_data|tojson }};
           const confLabels = confidencePieData.map(row => row.category);

@@ -213,11 +213,13 @@ button:hover {
 }
 .result-table tr:nth-child(even) td {
   background: #f5f7fa;
-  padding: 0.3em 0.5em;
+  /* padding: 0.3em 0.5em; */
 }
 .result-table tr:hover td {
   background: #e6f0ff;
   transition: background 0.2s;
+  padding: 0.5em 0.5em;
+
 }
 .table-container {
   max-height: 600px;
@@ -378,6 +380,147 @@ canvas {
 #confidencePieChart {
   width: 600px !important; /* Force width */
   height: 600px !important;
+}
+
+/* Confidence Details Container */
+.confidence-details {
+  margin: 2em auto;
+  max-width: 1200px;
+  padding: 1.5em;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(79, 139, 249, 0.08);
+}
+
+.confidence-details h3 {
+  color: #163e93;
+  font-size: 1.8em;
+  margin-bottom: 1em;
+  text-align: center;
+  font-weight: 600;
+}
+
+/* Stats Container */
+.confidence-stats {
+  overflow-x: auto;
+  margin-top: 1em;
+}
+
+/* Table Styles */
+.confidence-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1em;
+  font-size: 1.1em;
+  background: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(79, 139, 249, 0.06);
+}
+
+/* Table Header */
+.confidence-table th {
+  background-color: #163e93;
+  color: #ffffff;
+  font-weight: 500;
+  padding: 1em;
+  text-align: left;
+  font-size: 1.1em;
+  border-bottom: 2px solid #bfc7d1;
+}
+
+/* Table Cells */
+.confidence-table td {
+  padding: 0.8em 1em;
+  text-align: left;
+  border-bottom: 1px solid #e0e7ff;
+  color: #3a3a6a;
+}
+
+/* Alternating Row Colors */
+.confidence-table tr:nth-child(even) {
+  background-color: #f5f7fa;
+}
+
+/* Hover Effect */
+.confidence-table tr:hover {
+  background-color: #e6f0ff;
+  transition: background-color 0.2s ease;
+}
+
+/* Prediction Method Column Styles */
+.genai-method {
+  color: #28a745;
+  font-weight: 600;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+}
+
+.rules-method {
+  color: #007bff;
+  font-weight: 600;
+  background-color: rgba(0, 123, 255, 0.1);
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-block;
+  text-align: center;
+  min-width: 80px;
+}
+
+/* Last Column (Prediction Method) */
+.confidence-table td:last-child {
+  text-align: center;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .confidence-details {
+    margin: 1em;
+    padding: 1em;
+  }
+
+  .confidence-table {
+    font-size: 0.9em;
+  }
+
+  .confidence-table th,
+  .confidence-table td {
+    padding: 0.6em;
+  }
+
+  .genai-method,
+  .rules-method {
+    padding: 4px 8px;
+    min-width: 60px;
+  }
+}
+
+/* Interpretation Column Styles */
+.confidence-table td:nth-last-child(2) {
+  font-weight: 500;
+  color: #163e93;
+}
+
+/* Percentage Column Styles */
+.confidence-table td:nth-child(3) {
+  font-weight: 500;
+  color: #3a3a6a;
+}
+
+/* Count Column Styles */
+.confidence-table td:nth-child(2) {
+  font-weight: 500;
+  color: #3a3a6a;
+}
+
+/* Confidence Score Column Styles */
+.confidence-table td:first-child {
+  font-weight: 600;
+  color: #163e93;
 }
 
 /* Pie/Bar chart with info box layout */
