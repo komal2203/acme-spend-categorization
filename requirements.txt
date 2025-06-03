@@ -1,24 +1,20 @@
-# Core dependencies
-numpy
-pandas
-pyyaml
-fuzzywuzzy[speedup]
-sentence-transformers
-torch
-openai==0.28
-nltk
-faiss-cpu
-python-dotenv
-Flask
-matplotlib
+   # Core dependencies
+   numpy
+   pandas
+   pyyaml
+   fuzzywuzzy[speedup]
+   sentence-transformers
+   --find-links https://download.pytorch.org/whl/torch_stable.html
+   torch==2.0.1+cpu
+   openai==0.28
+   nltk
+   faiss-cpu
+   python-dotenv
+   Flask
+   matplotlib
 
-# Database
-mysql-connector-python
+   # Database
+   mysql-connector-python
 
-# Server
-gunicorn==20.1.0
-
-# Remove these as they're not needed for web deployment
-# streamlit (not needed for Flask web app)
-# schedule (not needed for web deployment)
-# watchdog (not needed for web deployment)
+   # Server
+   gunicorn==20.1.0
