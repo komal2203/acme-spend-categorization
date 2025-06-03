@@ -1,45 +1,305 @@
 Invoice ID,Supplier,SKU,Managing Account,Amount,Description
-4,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds
-5,Global Industries,Barley seeds,Account2,$920,Cereal seeds
-6,GreenFields Co,Ammonium nitrate fertilizer,Account3,"$1,200",Fertilizer
-7,BuildRight Inc,Steel beam,Account4,"$4,500",Construction materials
-8,ToolMasters,Electric drill,Account5,$350,Power tool
-9,MedTech Solutions,Latex gloves,Account1,$180,Medical gloves
-10,LabWorks LLC,Surgical mask,Account2,$75,Protective mask
-11,CleanWell Ltd,Broom,Account3,$45,Floor cleaning tool
-12,FreshFoods Ltd,Disposable plates,Account4,$120,Foodservice disposables
-13,TechGear,Desktop computer,Account5,"$2,200",Office computer
-14,NetConnect,Router,Account1,$300,Network router
-15,PrintPro,Printer ink,Account2,$230,Ink cartridge
-16,OfficeEssentials,Printer paper,Account3,$110,Copy paper
-17,SecureSafe,Fire alarm system,Account4,"$1,750",Fire safety equipment
-18,WatchGuard,CCTV camera,Account5,$550,Surveillance camera
-19,HomeComforts,Refrigerator,Account1,"$1,300",Kitchen appliance
-20,KitchenPro,Cookware set,Account2,$400,Kitchenware
-21,AutoParts Co,Hydraulic jack,Account3,$640,Garage equipment
-22,ServicePlus,Consulting fee,Account4,"$2,500",Professional consulting
-23,MaintMasters,HVAC servicing,Account5,"$1,100",Maintenance service
-24,FreshFoods Ltd,Live chickens,Account1,$320,Live poultry
-25,AgriSource,Live salmon,Account2,$450,Live fish
-26,PestControl Inc,Silkworms,Account3,$210,Live insects
-27,PetWorld,Cats,Account4,$150,Live animals (cats)
-28,PetWorld,Dogs,Account5,$180,Live animals (dogs)
-29,GreenFields Co,Bean seeds,Account1,$95,Legume seeds
-30,GreenFields Co,Carrot seeds,Account2,$85,Vegetable seeds
-31,OfficeEssentials,Office chair,Account3,$780,Furniture
-32,FurnitureHub,Desk lamp,Account4,$145,Lighting fixture
-33,CleanWell Ltd,Dishwasher,Account5,$900,Kitchen cleaning machine
-34,MedTech Solutions,Test tubes,Account1,$60,Lab glassware
-35,LabWorks LLC,Beakers,Account2,$55,Lab container
-36,SecureSafe,Bicycle helmet,Account3,$70,Safety gear
-37,HealthFirst,First aid kit,Account4,$130,Medical kit
-38,ServicePlus,Software license,Account5,"$2,000",Software subscription
-39,PrintPro,Laser printer,Account1,"$1,100",Printing hardware
-40,NetConnect,Network switch,Account2,$420,Switching equipment
-41,TechGear,Smartphone,Account3,$800,Mobile device
-42,BuildRight Inc,Safety helmet,Account4,$65,Construction safety gear
-43,ToolMasters,Hand saw,Account5,$120,Hand tool
-44,NatureSeeds,Zucchini seeds,Account5,$830,Vegetable seeds
-45,AgriSource,Delta-100,Account1,$1250,High-precision industrial widget for general use
-46,TransEquip Inc,XJ Pack,Account2,$2400,Multi-purpose equipment bundle with unclear specifications
-47,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
+1,FarmGrow Ltd,Wheat seeds,Account4,$106,Ordered quality wheat seeds for inventory
+2,TransEquip Inc,Colza seeds,Account5,$4391,Ordered quality colza seeds for inventory
+3,AgriSource,Barley seeds,Account2,$2805,Ordered quality barley seeds for inventory
+4,FarmGrow Ltd,Millet seeds,Account1,$362,Need millet seeds for planned operations
+5,AgriSource,Oat seeds,Account2,$1881,Ordered quality oat seeds for inventory
+6,AgriSource,Sesame seeds,Account5,$2601,Ordered quality sesame seeds for inventory
+7,MedTech Solutions,Linseed seeds,Account3,$3018,Ordered quality linseed seeds for inventory
+8,FarmGrow Ltd,Castor oil seeds,Account1,$4297,Ordered quality castor oil seeds for inventory
+9,AutoMobile Co,Maize seeds,Account3,$1055,Procurement of top-grade maize seeds materials
+10,FarmGrow Ltd,Rye seeds,Account5,$2273,Ordered quality rye seeds for inventory
+11,AgriSource,Sorghum seeds,Account4,$2998,Need sorghum seeds for planned operations
+12,TransEquip Inc,Grass and forage seeds and seedlings,Account5,$720,Procurement of top-grade grass and forage seeds and seedlings materials
+13,FarmGrow Ltd,Rice seeds or seedlings,Account5,$1910,Need rice seeds or seedlings for planned operations
+14,TransEquip Inc,Spice crop seeds and seedlings,Account1,$514,Need spice crop seeds and seedlings for planned operations
+15,FarmGrow Ltd,Flower seeds and bulbs and seedlings and cuttings,Account1,$1038,Need flower seeds and bulbs and seedlings and cuttings for planned operations
+16,TransEquip Inc,Suture boots and capturing devices,Account3,$2853,Ordered quality suture boots and capturing devices for inventory
+17,AgriSource,Suture carts or racks,Account4,$138,Requested shipment of suture carts or racks units
+18,AutoMobile Co,Suture removal kits or trays or packs or sets,Account3,$1670,Requested shipment of suture removal kits or trays or packs or sets units
+19,FarmGrow Ltd,Suture removers,Account4,$2362,Requested shipment of suture removers units
+20,AutoMobile Co,Wound cleaning and debridement products,Account2,$2346,Purchase request for wound cleaning and debridement products items
+21,FarmGrow Ltd,Absorbers for wound cleansing,Account2,$270,Need absorbers for wound cleansing for planned operations
+22,FarmGrow Ltd,Debridement sponges,Account2,$2420,Requested shipment of debridement sponges units
+23,TransEquip Inc,Pulsed lavage systems for wound treatment,Account3,$4154,Ordered quality pulsed lavage systems for wound treatment for inventory
+24,AgriSource,Autolytic debridement products,Account2,$871,Purchase request for autolytic debridement products items
+25,MedTech Solutions,Enzymatic debridement products,Account1,$688,Procurement of top-grade enzymatic debridement products materials
+26,AgriSource,Frame relay telecommunications service,Account2,$4040,Ordered quality frame relay telecommunications service for inventory
+27,AgriSource,Ostomy bag rings,Account5,$4182,Need ostomy bag rings for planned operations
+28,MedTech Solutions,Ostomy starter kits,Account3,$1499,Requested shipment of ostomy starter kits units
+29,MedTech Solutions,Ostomy bag covers,Account3,$2381,Requested shipment of ostomy bag covers units
+30,AgriSource,Ostomy belts,Account1,$3622,Ordered quality ostomy belts for inventory
+31,AutoMobile Co,Ostomy bag plugs,Account5,$2875,Need ostomy bag plugs for planned operations
+32,TransEquip Inc,Faxswitch machines,Account1,$1840,Procurement of top-grade faxswitch machines materials
+33,FarmGrow Ltd,2G GSM wireless access network equipment and components,Account4,$3566,Requested shipment of 2g gsm wireless access network equipment and components units
+34,FarmGrow Ltd,Dressing covers for general use,Account4,$1806,Procurement of top-grade dressing covers for general use materials
+35,AutoMobile Co,Removal devices of diagnostic or interventional vascular catheters,Account2,$1326,Requested shipment of removal devices of diagnostic or interventional vascular catheters units
+36,AutoMobile Co,Overshoes,Account2,$188,Ordered quality overshoes for inventory
+37,TransEquip Inc,Dumb waiter,Account5,$1581,Procurement of top-grade dumb waiter materials
+38,AutoMobile Co,Vehicle parking lift system,Account4,$4446,Ordered quality vehicle parking lift system for inventory
+39,AutoMobile Co,Tractor towed crane,Account1,$3678,Need tractor towed crane for planned operations
+40,TransEquip Inc,Lifting magnet,Account4,$579,Need lifting magnet for planned operations
+41,FarmGrow Ltd,Vehicle movable jack or dolly,Account1,$532,Purchase request for vehicle movable jack or dolly items
+42,FarmGrow Ltd,Vehicle lift,Account3,$2131,Need vehicle lift for planned operations
+43,TransEquip Inc,Straw bag,Account5,$4180,Purchase request for straw bag items
+44,FarmGrow Ltd,Cotton bag,Account5,$2881,Need cotton bag for planned operations
+45,AutoMobile Co,Zipper bag,Account4,$102,Need zipper bag for planned operations
+46,FarmGrow Ltd,Hot water tank,Account4,$1417,Procurement of top-grade hot water tank materials
+47,AgriSource,Steam condensate tank,Account5,$3807,Need steam condensate tank for planned operations
+48,MedTech Solutions,Liquified gas tank or cylinder,Account4,$4720,Need liquified gas tank or cylinder for planned operations
+49,MedTech Solutions,Cement silo,Account1,$1663,Ordered quality cement silo for inventory
+50,AutoMobile Co,Cold storage box,Account1,$4535,Procurement of top-grade cold storage box materials
+51,AutoMobile Co,Ballot box,Account5,$3620,Procurement of top-grade ballot box materials
+52,MedTech Solutions,Temperature controlled freight container,Account2,$964,Ordered quality temperature controlled freight container for inventory
+53,MedTech Solutions,Electrically powered vehicle,Account2,$434,Need electrically powered vehicle for planned operations
+54,MedTech Solutions,Motorcycle sidecar,Account5,$2414,Ordered quality motorcycle sidecar for inventory
+55,TransEquip Inc,Road repair truck,Account4,$754,Ordered quality road repair truck for inventory
+56,AutoMobile Co,Crawler type tractor,Account3,$2094,Purchase request for crawler type tractor items
+57,AgriSource,Guard rail cleaning vehicle,Account1,$3887,Need guard rail cleaning vehicle for planned operations
+58,MedTech Solutions,Sign truck,Account4,$4638,Ordered quality sign truck for inventory
+59,AutoMobile Co,Snow plow truck,Account2,$3567,Need snow plow truck for planned operations
+60,MedTech Solutions,Salt spreader truck,Account5,$1134,Requested shipment of salt spreader truck units
+61,MedTech Solutions,Mobile media truck,Account3,$4548,Requested shipment of mobile media truck units
+62,FarmGrow Ltd,Mobile office van,Account4,$1540,Requested shipment of mobile office van units
+63,FarmGrow Ltd,Lighting truck,Account3,$2899,Purchase request for lighting truck items
+64,FarmGrow Ltd,Outside broadcasting van,Account5,$1734,Requested shipment of outside broadcasting van units
+65,AutoMobile Co,Crowd control truck,Account5,$1611,Purchase request for crowd control truck items
+66,FarmGrow Ltd,Crane truck,Account2,$4414,Need crane truck for planned operations
+67,AutoMobile Co,Funeral vehicle or hearse,Account2,$1605,Ordered quality funeral vehicle or hearse for inventory
+68,FarmGrow Ltd,Spray truck,Account4,$4849,Requested shipment of spray truck units
+69,FarmGrow Ltd,Vacuum truck,Account2,$4632,Requested shipment of vacuum truck units
+70,AgriSource,Medical examination and treatment bus,Account3,$668,Procurement of top-grade medical examination and treatment bus materials
+71,FarmGrow Ltd,Bloodmobile,Account4,$1835,Purchase request for bloodmobile items
+72,AgriSource,Bulk carrier,Account4,$2940,Procurement of top-grade bulk carrier materials
+73,TransEquip Inc,Row boat,Account1,$3755,Purchase request for row boat items
+74,MedTech Solutions,Quarantine boat,Account4,$2669,Purchase request for quarantine boat items
+75,AutoMobile Co,Weather ship,Account5,$4468,Requested shipment of weather ship units
+76,AutoMobile Co,Debris collection vessel,Account5,$4395,Requested shipment of debris collection vessel units
+77,TransEquip Inc,Training ship,Account4,$2773,Procurement of top-grade training ship materials
+78,AutoMobile Co,Coast guard boat or cutter,Account5,$563,Requested shipment of coast guard boat or cutter units
+79,MedTech Solutions,Fishery training ship,Account1,$2682,Procurement of top-grade fishery training ship materials
+80,FarmGrow Ltd,Fishery research ship,Account2,$1383,Purchase request for fishery research ship items
+81,AgriSource,Marine pollution control ship,Account3,$271,Purchase request for marine pollution control ship items
+82,AutoMobile Co,Vehicle air conditioner,Account4,$1229,Ordered quality vehicle air conditioner for inventory
+83,FarmGrow Ltd,Vehicle heater,Account4,$327,Procurement of top-grade vehicle heater materials
+84,AgriSource,Vehicle air purifier,Account3,$2199,Procurement of top-grade vehicle air purifier materials
+85,FarmGrow Ltd,Tachograph,Account5,$2986,Purchase request for tachograph items
+86,TransEquip Inc,Electric vehicle charging systems,Account4,$2063,Requested shipment of electric vehicle charging systems units
+87,FarmGrow Ltd,Cargo truck body,Account2,$2338,Need cargo truck body for planned operations
+88,TransEquip Inc,Dump truck body,Account4,$1730,Purchase request for dump truck body items
+89,AutoMobile Co,Trailer body,Account1,$2389,Ordered quality trailer body for inventory
+90,AgriSource,Air cargo trailer,Account1,$2565,Procurement of top-grade air cargo trailer materials
+91,AgriSource,Agricultural trailer,Account1,$2177,Procurement of top-grade agricultural trailer materials
+92,TransEquip Inc,Ground controlled approach system,Account3,$3189,Need ground controlled approach system for planned operations
+93,TransEquip Inc,Aircraft air start unit,Account3,$4493,Ordered quality aircraft air start unit for inventory
+94,FarmGrow Ltd,Wheat seeds,Account1,$1971,Requested shipment of wheat seeds units
+95,MedTech Solutions,Colza seeds,Account1,$1689,Purchase request for colza seeds items
+96,FarmGrow Ltd,Barley seeds,Account2,$317,Purchase request for barley seeds items
+97,FarmGrow Ltd,Millet seeds,Account4,$3550,Purchase request for millet seeds items
+98,MedTech Solutions,Oat seeds,Account4,$3980,Ordered quality oat seeds for inventory
+99,AutoMobile Co,Sesame seeds,Account3,$751,Purchase request for sesame seeds items
+100,AutoMobile Co,Linseed seeds,Account1,$4181,Requested shipment of linseed seeds units
+101,AgriSource,Castor oil seeds,Account3,$158,Procurement of top-grade castor oil seeds materials
+102,AgriSource,Maize seeds,Account1,$1473,Procurement of top-grade maize seeds materials
+103,FarmGrow Ltd,Rye seeds,Account3,$3250,Purchase request for rye seeds items
+104,FarmGrow Ltd,Sorghum seeds,Account2,$4844,Purchase request for sorghum seeds items
+105,AgriSource,Grass and forage seeds and seedlings,Account3,$4126,Purchase request for grass and forage seeds and seedlings items
+106,TransEquip Inc,Rice seeds or seedlings,Account5,$4257,Requested shipment of rice seeds or seedlings units
+107,AgriSource,Spice crop seeds and seedlings,Account5,$4515,Purchase request for spice crop seeds and seedlings items
+108,AutoMobile Co,Flower seeds and bulbs and seedlings and cuttings,Account1,$2864,Purchase request for flower seeds and bulbs and seedlings and cuttings items
+109,FarmGrow Ltd,Suture boots and capturing devices,Account3,$3126,Procurement of top-grade suture boots and capturing devices materials
+110,AutoMobile Co,Suture carts or racks,Account4,$3389,Need suture carts or racks for planned operations
+111,MedTech Solutions,Suture removal kits or trays or packs or sets,Account5,$4373,Procurement of top-grade suture removal kits or trays or packs or sets materials
+112,TransEquip Inc,Suture removers,Account3,$3782,Procurement of top-grade suture removers materials
+113,FarmGrow Ltd,Wound cleaning and debridement products,Account5,$2742,Need wound cleaning and debridement products for planned operations
+114,FarmGrow Ltd,Absorbers for wound cleansing,Account5,$4880,Purchase request for absorbers for wound cleansing items
+115,TransEquip Inc,Debridement sponges,Account1,$1920,Need debridement sponges for planned operations
+116,AutoMobile Co,Pulsed lavage systems for wound treatment,Account4,$4382,Requested shipment of pulsed lavage systems for wound treatment units
+117,MedTech Solutions,Autolytic debridement products,Account4,$3442,Ordered quality autolytic debridement products for inventory
+118,AgriSource,Enzymatic debridement products,Account4,$2059,Need enzymatic debridement products for planned operations
+119,AgriSource,Frame relay telecommunications service,Account3,$2368,Purchase request for frame relay telecommunications service items
+120,TransEquip Inc,Ostomy bag rings,Account1,$979,Procurement of top-grade ostomy bag rings materials
+121,AgriSource,Ostomy starter kits,Account3,$1232,Need ostomy starter kits for planned operations
+122,TransEquip Inc,Ostomy bag covers,Account1,$2695,Procurement of top-grade ostomy bag covers materials
+123,AgriSource,Ostomy belts,Account3,$3424,Need ostomy belts for planned operations
+124,AgriSource,Ostomy bag plugs,Account5,$710,Purchase request for ostomy bag plugs items
+125,FarmGrow Ltd,Faxswitch machines,Account5,$3182,Need faxswitch machines for planned operations
+126,AgriSource,2G GSM wireless access network equipment and components,Account2,$4045,Procurement of top-grade 2g gsm wireless access network equipment and components materials
+127,AutoMobile Co,Dressing covers for general use,Account3,$439,Purchase request for dressing covers for general use items
+128,MedTech Solutions,Removal devices of diagnostic or interventional vascular catheters,Account1,$3688,Ordered quality removal devices of diagnostic or interventional vascular catheters for inventory
+129,FarmGrow Ltd,Overshoes,Account4,$4205,Need overshoes for planned operations
+130,AutoMobile Co,Dumb waiter,Account5,$1123,Need dumb waiter for planned operations
+131,TransEquip Inc,Vehicle parking lift system,Account1,$2028,Need vehicle parking lift system for planned operations
+132,AgriSource,Tractor towed crane,Account3,$3963,Ordered quality tractor towed crane for inventory
+133,AgriSource,Lifting magnet,Account4,$4591,Need lifting magnet for planned operations
+134,MedTech Solutions,Vehicle movable jack or dolly,Account4,$2321,Need vehicle movable jack or dolly for planned operations
+135,TransEquip Inc,Vehicle lift,Account2,$2827,Purchase request for vehicle lift items
+136,AutoMobile Co,Straw bag,Account1,$364,Purchase request for straw bag items
+137,MedTech Solutions,Cotton bag,Account4,$2511,Requested shipment of cotton bag units
+138,FarmGrow Ltd,Zipper bag,Account3,$4106,Ordered quality zipper bag for inventory
+139,AgriSource,Hot water tank,Account4,$2872,Procurement of top-grade hot water tank materials
+140,TransEquip Inc,Steam condensate tank,Account3,$4375,Need steam condensate tank for planned operations
+141,FarmGrow Ltd,Liquified gas tank or cylinder,Account5,$1997,Purchase request for liquified gas tank or cylinder items
+142,TransEquip Inc,Cement silo,Account4,$2688,Purchase request for cement silo items
+143,MedTech Solutions,Cold storage box,Account3,$1560,Procurement of top-grade cold storage box materials
+144,AgriSource,Ballot box,Account3,$711,Procurement of top-grade ballot box materials
+145,TransEquip Inc,Temperature controlled freight container,Account4,$1960,Procurement of top-grade temperature controlled freight container materials
+146,TransEquip Inc,Electrically powered vehicle,Account3,$4060,Requested shipment of electrically powered vehicle units
+147,TransEquip Inc,Motorcycle sidecar,Account5,$212,Purchase request for motorcycle sidecar items
+148,MedTech Solutions,Road repair truck,Account2,$3818,Procurement of top-grade road repair truck materials
+149,AgriSource,Crawler type tractor,Account1,$2601,Purchase request for crawler type tractor items
+150,MedTech Solutions,Guard rail cleaning vehicle,Account2,$4208,Requested shipment of guard rail cleaning vehicle units
+151,MedTech Solutions,Sign truck,Account5,$2787,Procurement of sign truck materials
+152,TransEquip Inc,Snow plow truck,Account5,$3470,Purchase request for snow plow truck items
+153,AgriSource,Salt spreader truck,Account4,$2907,Requested shipment of salt spreader truck units
+154,AgriSource,Mobile media truck,Account4,$4950,Need mobile media truck for planned operations
+155,AgriSource,Mobile office van,Account2,$4386,Purchase request for mobile office van items
+156,TransEquip Inc,Lighting truck,Account2,$4214,Purchase request for lighting truck items
+157,AgriSource,Outside broadcasting van,Account1,$868,Procurement of outside broadcasting van materials
+158,MedTech Solutions,Crowd control truck,Account4,$3534,Requested shipment of crowd control truck units
+159,MedTech Solutions,Crane truck,Account3,$2962,Procurement of crane truck materials
+160,AutoMobile Co,Funeral vehicle or hearse,Account4,$3892,Procurement of funeral vehicle or hearse materials
+161,AgriSource,Spray truck,Account5,$2463,Procurement of spray truck materials
+162,FarmGrow Ltd,Vacuum truck,Account2,$1123,Purchase request for vacuum truck items
+163,FarmGrow Ltd,Medical examination and treatment bus,Account3,$3862,Need medical examination and treatment bus for planned operations
+164,FarmGrow Ltd,Bloodmobile,Account1,$4181,Requested shipment of bloodmobile units
+165,MedTech Solutions,Bulk carrier,Account2,$3764,Purchase request for bulk carrier items
+166,AutoMobile Co,Row boat,Account1,$1652,Purchase request for row boat items
+167,FarmGrow Ltd,Quarantine boat,Account1,$3115,Ordered quality quarantine boat for inventory
+168,AgriSource,Weather ship,Account1,$2916,Procurement of weather ship materials
+169,TransEquip Inc,Debris collection vessel,Account5,$3195,Procurement of debris collection vessel materials
+170,AgriSource,Training ship,Account1,$672,Need training ship for planned operations
+171,AgriSource,Coast guard boat or cutter,Account2,$124,Need coast guard boat or cutter for planned operations
+172,FarmGrow Ltd,Fishery training ship,Account3,$3224,Need fishery training ship for planned operations
+173,AutoMobile Co,Fishery research ship,Account1,$117,Need fishery research ship for planned operations
+174,FarmGrow Ltd,Marine pollution control ship,Account3,$2812,Need marine pollution control ship for planned operations
+175,TransEquip Inc,Vehicle air conditioner,Account1,$2687,Requested shipment of vehicle air conditioner units
+176,AgriSource,Vehicle heater,Account5,$430,Need vehicle heater for planned operations
+177,AutoMobile Co,Vehicle air purifier,Account4,$2563,Requested shipment of vehicle air purifier units
+178,AgriSource,Tachograph,Account4,$1168,Purchase request for tachograph items
+179,FarmGrow Ltd,Electric vehicle charging systems,Account5,$4444,Purchase request for electric vehicle charging systems items
+180,AutoMobile Co,Cargo truck body,Account2,$3751,Purchase request for cargo truck body items
+181,AutoMobile Co,Dump truck body,Account3,$3620,Ordered quality dump truck body for inventory
+182,AgriSource,Trailer body,Account4,$4851,Purchase request for trailer body items
+183,FarmGrow Ltd,Air cargo trailer,Account3,$3770,Procurement of air cargo trailer materials
+184,AutoMobile Co,Agricultural trailer,Account5,$2086,Purchase request for agricultural trailer units
+185,FarmGrow Ltd,Ground controlled approach system,Account5,$4169,Purchase request for ground controlled approach system items
+186,TransEquip Inc,Aircraft air start unit,Account2,$4432,Purchase request for aircraft air start unit items
+187,MedTech Solutions,Wheat seeds,Account4,$3528,Need wheat seeds for planned operations
+188,TransEquip Inc,Colza seeds,Account1,$2392,Procurement of colza seeds materials
+189,AutoMobile Co,Barley seeds,Account2,$4270,Purchase request for barley seeds units
+190,AutoMobile Co,Millet seeds,Account1,$4670,Purchase request for millet seeds units
+191,AutoMobile Co,Oat seeds,Account4,$116,Need oat seeds for planned operations
+192,TransEquip Inc,Sesame seeds,Account1,$3197,Ordered quality sesame seeds for inventory
+193,TransEquip Inc,Linseed seeds,Account4,$847,Procurement of linseed seeds materials
+194,AutoMobile Co,Castor oil seeds,Account1,$2130,Procurement of castor oil seeds materials
+195,AutoMobile Co,Maize seeds,Account4,$1271,Ordered quality maize seeds for inventory
+196,AgriSource,Rye seeds,Account1,$3848,Procurement of rye seeds materials
+197,MedTech Solutions,Sorghum seeds,Account1,$2195,Procurement of sorghum seeds materials
+198,AutoMobile Co,Grass and forage seeds and seedlings,Account5,$1884,Purchase request for grass and forage seeds and seedlings items
+199,AutoMobile Co,Rice seeds or seedlings,Account5,$2285,Need rice seeds or seedlings for planned operations
+200,FarmGrow Ltd,Spice crop seeds and seedlings,Account4,$1129,Need spice crop seeds and seedlings for planned operations
+201,AgriSource,Flower seeds and bulbs and seedlings and cuttings,Account2,$4256,Purchase request for flower seeds and bulbs and seedlings and cuttings items
+202,TransEquip Inc,Suture boots and capturing devices,Account4,$4709,Ordered quality suture boots and capturing devices for inventory
+203,AutoMobile Co,Suture carts or racks,Account2,$4174,Requested shipment of suture carts or racks units
+204,MedTech Solutions,Suture removal kits or trays or packs or sets,Account3,$1226,Requested shipment of suture removal kits or trays or packs or sets units
+205,MedTech Solutions,Suture removers,Account4,$3980,Need suture removers for planned operations
+206,AutoMobile Co,Wound cleaning and debridement products,Account1,$3284,Need wound cleaning and debridement products for planned operations
+207,AutoMobile Co,Absorbers for wound cleansing,Account3,$334,Procurement of absorbers for wound cleansing materials
+208,FarmGrow Ltd,Debridement sponges,Account3,$874,Requested shipment of debridement sponges units
+209,TransEquip Inc,Pulsed lavage systems for wound treatment,Account2,$2349,Purchase request for pulsed lavage systems for wound treatment items
+210,AgriSource,Autolytic debridement products,Account1,$3197,Ordered quality autolytic debridement products for inventory
+211,AgriSource,Enzymatic debridement products,Account5,$3707,Procurement of enzymatic debridement products materials
+212,AgriSource,Frame relay telecommunications service,Account2,$2009,Purchase request for frame relay telecommunications service items
+213,MedTech Solutions,Ostomy bag rings,Account1,$3690,Ordered quality ostomy bag rings for inventory
+214,FarmGrow Ltd,Ostomy starter kits,Account1,$3651,Requested shipment of ostomy starter kits units
+215,AgriSource,Ostomy bag covers,Account2,$576,Requested shipment of ostomy bag covers units
+216,AutoMobile Co,Ostomy belts,Account3,$1773,Procurement of ostomy belts materials
+217,TransEquip Inc,Ostomy bag plugs,Account5,$1587,Procurement of ostomy bag plugs materials
+218,TransEquip Inc,Faxswitch machines,Account4,$1555,Requested shipment of faxswitch machines units
+219,FarmGrow Ltd,2G GSM wireless access network equipment and components,Account5,$2307,Purchase request for 2g gsm wireless access network equipment and components items
+220,AgriSource,Dressing covers for general use,Account3,$4980,Requested shipment of dressing covers for general use units
+221,AgriSource,Removal devices of diagnostic or interventional vascular catheters,Account4,$3215,Requested shipment of removal devices of diagnostic or interventional vascular catheters units
+222,FarmGrow Ltd,Overshoes,Account5,$3371,Need overshoes for planned operations
+223,MedTech Solutions,Dumb waiter,Account3,$2942,Requested shipment of dumb waiter units
+224,FarmGrow Ltd,Vehicle parking lift system,Account1,$600,Purchase request for vehicle parking lift system items
+225,TransEquip Inc,Tractor towed crane,Account1,$1159,Purchase request for tractor towed crane items
+226,MedTech Solutions,Lifting magnet,Account5,$4617,Requested shipment of lifting magnet units
+227,AutoMobile Co,Vehicle movable jack or dolly,Account5,$569,Requested shipment of vehicle movable jack or dolly units
+228,AgriSource,Vehicle lift,Account2,$3125,Need vehicle lift for planned operations
+229,AgriSource,Straw bag,Account5,$3726,Procurement of straw bag materials
+230,FarmGrow Ltd,Cotton bag,Account5,$1464,Ordered quality cotton bag for inventory
+231,TransEquip Inc,Zipper bag,Account3,$1047,Ordered quality zipper bag for inventory
+232,AgriSource,Hot water tank,Account3,$2496,Purchase request for hot water tank items
+233,AutoMobile Co,Steam condensate tank,Account4,$2791,Requested shipment of steam condensate tank units
+234,MedTech Solutions,Liquified gas tank or cylinder,Account1,$4509,Purchase request for liquified gas tank or cylinder items
+235,MedTech Solutions,Cement silo,Account5,$717,Ordered quality cement silo for inventory
+236,AgriSource,Cold storage box,Account4,$1490,Need cold storage box for planned operations
+237,AutoMobile Co,Ballot box,Account2,$1312,Need ballot box for planned operations
+238,MedTech Solutions,Temperature controlled freight container,Account1,$3314,Ordered quality temperature controlled freight container for inventory
+239,AutoMobile Co,Electrically powered vehicle,Account2,$1363,Procurement of electrically powered vehicle materials
+240,FarmGrow Ltd,Motorcycle sidecar,Account5,$2418,Ordered quality motorcycle sidecar for inventory
+241,FarmGrow Ltd,Road repair truck,Account4,$4089,Procurement of road repair truck materials
+242,AutoMobile Co,Crawler type tractor,Account1,$2040,Purchase request for crawler type tractor items
+243,AgriSource,Guard rail cleaning vehicle,Account3,$1076,Purchase request for guard rail cleaning vehicle items
+244,AgriSource,Sign truck,Account1,$519,Procurement of sign truck materials
+245,MedTech Solutions,Snow plow truck,Account1,$996,Procurement of snow plow truck materials
+246,AgriSource,Salt spreader truck,Account1,$264,Requested shipment of salt spreader truck units
+247,FarmGrow Ltd,Mobile media truck,Account4,$3089,Purchase request for mobile media truck items
+248,MedTech Solutions,Mobile office van,Account4,$1255,Procurement of mobile office van materials
+249,FarmGrow Ltd,Lighting truck,Account5,$1038,Procurement of lighting truck materials
+250,MedTech Solutions,Outside broadcasting van,Account2,$1378,Need outside broadcasting van for planned operations
+251,TransEquip Inc,Crowd control truck,Account2,$3029,Ordered quality crowd control truck for inventory
+252,AgriSource,Crane truck,Account3,$3291,Procurement of crane truck materials
+253,TransEquip Inc,Funeral vehicle or hearse,Account1,$4655,Procurement of funeral vehicle or hearse materials
+254,TransEquip Inc,Spray truck,Account1,$4104,Ordered quality spray truck for inventory
+255,FarmGrow Ltd,Vacuum truck,Account1,$4703,Purchase request for vacuum truck items
+256,MedTech Solutions,Medical examination and treatment bus,Account4,$4001,Procurement of medical examination and treatment bus materials
+257,AgriSource,Bloodmobile,Account4,$3432,Purchase request for bloodmobile items
+258,FarmGrow Ltd,Bulk carrier,Account4,$1909,Need bulk carrier for planned operations
+259,AgriSource,Row boat,Account2,$4157,Purchase request for row boat items
+260,AutoMobile Co,Quarantine boat,Account4,$3761,Need quarantine boat for planned operations
+261,FarmGrow Ltd,Weather ship,Account2,$2928,Purchase request for weather ship items
+262,TransEquip Inc,Debris collection vessel,Account5,$3195,Procurement of debris collection vessel materials
+263,AgriSource,Training ship,Account1,$672,Need training ship for planned operations
+264,AgriSource,Coast guard boat or cutter,Account2,$124,Need coast guard boat or cutter for planned operations
+265,FarmGrow Ltd,Fishery training ship,Account3,$3224,Need fishery training ship for planned operations
+266,AutoMobile Co,Fishery research ship,Account1,$117,Need fishery research ship for planned operations
+267,FarmGrow Ltd,Marine pollution control ship,Account3,$2812,Need marine pollution control ship for planned operations
+268,TransEquip Inc,Vehicle air conditioner,Account1,$2687,Requested shipment of vehicle air conditioner units
+269,AgriSource,Vehicle heater,Account5,$430,Need vehicle heater for planned operations
+270,AutoMobile Co,Vehicle air purifier,Account4,$2563,Requested shipment of vehicle air purifier units
+271,AgriSource,Tachograph,Account4,$1168,Purchase request for tachograph items
+272,FarmGrow Ltd,Electric vehicle charging systems,Account5,$4444,Purchase request for electric vehicle charging systems items
+273,AutoMobile Co,Cargo truck body,Account2,$3751,Purchase request for cargo truck body items
+274,AutoMobile Co,Dump truck body,Account3,$3620,Ordered quality dump truck body for inventory
+275,AgriSource,Trailer body,Account4,$4851,Purchase request for trailer body items
+276,FarmGrow Ltd,Air cargo trailer,Account3,$3770,Procurement of air cargo trailer materials
+277,TransEquip Inc,Agricultural trailer,Account4,$1107,Ordered quality agricultural trailer materials
+278,AutoMobile Co,Ground controlled approach system,Account5,$915,Ordered quality ground controlled approach system materials
+279,AgriSource,Aircraft air start unit,Account2,$4432,Procurement of aircraft air start unit items
+280,MedTech Solutions,Wheat seeds,Account4,$3528,Need wheat seeds for planned operations
+281,TransEquip Inc,Colza seeds,Account1,$2392,Procurement of colza seeds materials
+282,AutoMobile Co,Barley seeds,Account2,$4270,Requested shipment of barley seeds units
+283,AutoMobile Co,Millet seeds,Account1,$4670,Requested shipment of millet seeds units
+284,AutoMobile Co,Oat seeds,Account4,$116,Need oat seeds for planned operations
+285,TransEquip Inc,Sesame seeds,Account1,$3197,Ordered quality sesame seeds for inventory
+286,TransEquip Inc,Linseed seeds,Account4,$847,Procurement of linseed seeds materials
+287,AutoMobile Co,Castor oil seeds,Account1,$2130,Procurement of castor oil seeds materials
+288,AutoMobile Co,Maize seeds,Account4,$1271,Ordered quality maize seeds for inventory
+289,AgriSource,Rye seeds,Account1,$3848,Procurement of rye seeds materials
+290,MedTech Solutions,Sorghum seeds,Account1,$2195,Procurement of sorghum seeds materials
+291,AutoMobile Co,Grass and forage seeds and seedlings,Account5,$1884,Purchase request for grass and forage seeds and seedlings units
+292,AutoMobile Co,Rice seeds or seedlings,Account5,$2285,Need rice seeds or seedlings for planned operations
+293,FarmGrow Ltd,Spice crop seeds and seedlings,Account4,$1129,Need spice crop seeds and seedlings for planned operations
+294,AutoMobile Co,Flower seeds and bulbs and seedlings and cuttings,Account3,$712,Requested shipment of flower seeds and bulbs and seedlings and cuttings units
+295,AutoMobile Co,Suture boots and capturing devices,Account5,$1122,Need suture boots and capturing devices for planned operations
+296,FarmGrow Ltd,Suture carts or racks,Account4,$4126,Need suture carts or racks for planned operations
+297,FarmGrow Ltd,Suture removal kits or trays or packs or sets,Account1,$596,Ordered quality suture removal kits or trays or packs or sets for inventory
+298,AutoMobile Co,Suture removers,Account3,$4159,Ordered quality suture removers for inventory
+299,MedTech Solutions,Wound cleaning and debridement products,Account5,$3503,Ordered quality wound cleaning and debridement products for inventory
+300,MedTech Solutions,Absorbers for wound cleansing,Account2,$2713,Ordered quality absorbers for wound cleansing for inventory
+301,NatureSeeds,Zucchini seeds,Account5,$830,Vegetable seeds
+302,AgriSource,Delta-100,Account1,$1250,High-precision industrial widget for general use
+303,TransEquip Inc,XJ Pack,Account2,$2400,Multi-purpose equipment bundle with unclear specifications
+304,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
