@@ -96,9 +96,32 @@ def manual_review():
         unspsc_dropdown_map=unspsc_dropdown_map
     )
 
+# @app.route("/download_categorized")
+# def download_categorized():
+#     return send_from_directory(directory="data", path="categorized.csv", as_attachment=True)
+
 @app.route("/download_categorized")
 def download_categorized():
-    return send_from_directory(directory="data", path="categorized.csv", as_attachment=True)
+    df = pd.read_csv("data/categorized.csv")
+    df.columns = [prettify_column(c) for c in df.columns]
+    # Remove the Confidence Rounded column if it exists
+    if 'Confidence Rounded' in df.columns:
+        df = df.drop(columns=['Confidence Rounded'])
+    df = df.rename(columns={
+        "Commodity Title": "UNSPSC Category Name",  # Removed \n
+        "Commodity Code": "UNSPSC Category ID"      # Removed \n
+    })
+    # Save the modified DataFrame to a temporary file
+    temp_path = "data/temp_categorized.csv"
+    df.to_csv(temp_path, index=False)
+    try:
+        return send_from_directory(directory="data", path="temp_categorized.csv", as_attachment=True)
+    finally:
+        # Clean up the temporary file
+        try:
+            os.remove(temp_path)
+        except:
+            pass
 
 @app.route("/download_manual")
 def download_manual():
@@ -171,6 +194,9 @@ def index():
         result_df = pd.read_csv("data/categorized.csv")
         result_df.columns = [prettify_column(c) for c in result_df.columns]
         
+        # Remove the Confidence Rounded column if it exists
+        if 'Confidence Rounded' in result_df.columns:
+            result_df = result_df.drop(columns=['Confidence Rounded'])
         # Explicitly rename the two columns
         result_df = result_df.rename(columns={
             "Commodity Title": "UNSPSC\nCategory\nName",
@@ -180,7 +206,7 @@ def index():
         commodity_col = "UNSPSC\nCategory\nName"
         if commodity_col in result_df.columns and not result_df.empty:
             result_df = result_df.dropna(subset=[commodity_col])
-            top_n = 15
+            top_n = 10
             vc_df = result_df[commodity_col].value_counts().nlargest(top_n).reset_index()
             cat_col = vc_df.columns[0]
             count_col = vc_df.columns[1]
@@ -229,8 +255,10 @@ def index():
 
         confidence_col = next((c for c in result_df.columns if 'Confidence' in c), None)
         if confidence_col and not result_df.empty:
-            result_df['Confidence Rounded'] = result_df[confidence_col].round(4)
-            confidence_counts = result_df['Confidence Rounded'].value_counts().nlargest(5).reset_index()
+            # Create a temporary column for pie chart data only
+            temp_df = result_df.copy()
+            temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
+            confidence_counts = temp_df['Confidence Rounded'].value_counts().nlargest(5).reset_index()
             conf_val_col = confidence_counts.columns[0]
             conf_count_col = confidence_counts.columns[1]
             confidence_pie_data = (
@@ -246,6 +274,10 @@ def index():
             'Class Code', 'Class Title'
         ]
         result_df = result_df.drop(columns=[c for c in cols_to_remove if c in result_df.columns])
+
+        # Remove the confidence rounded column from the final table
+        if 'Confidence Rounded' in result_df.columns:
+            result_df = result_df.drop(columns=['Confidence Rounded'])
 
         result_table = result_df.to_html(classes="result-table", index=False)
 
@@ -276,13 +308,21 @@ def index():
 def download():
     df = pd.read_csv("data/categorized.csv")
     df.columns = [prettify_column(c) for c in df.columns]
+    # Remove the Confidence Rounded column if it exists
+    if 'Confidence Rounded' in df.columns:
+        df = df.drop(columns=['Confidence Rounded'])
     df = df.rename(columns={
         "Commodity Title": "UNSPSC\nCategory\nName",
         "Commodity Code": "UNSPSC \nCategory ID\n"
     })
-    temp_path = "data/categorized_pretty.csv"
+    # temp_path = "data/categorized_pretty.csv"
+    # df.to_csv(temp_path, index=False)
+    # return send_from_directory(directory="data", path="categorized_pretty.csv", as_attachment=True)
+
+     # Save the modified DataFrame to a temporary file
+    temp_path = "data/temp_categorized.csv"
     df.to_csv(temp_path, index=False)
-    return send_from_directory(directory="data", path="categorized_pretty.csv", as_attachment=True)
+    return send_from_directory(directory="data", path="temp_categorized.csv", as_attachment=True)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
