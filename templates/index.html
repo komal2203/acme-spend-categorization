@@ -89,7 +89,7 @@
         {% if chart_data and chart_data|length > 0 %}
         <div class="resulttitle">
           <h2>
-            <span class="modeltime">Category Distribution - Top 15</span>
+            <span class="modeltime">Category Distribution - Top 10</span>
           </h2>
           <button id="downloadBarChart" class="download-btn" type="button">
             Download Bar Chart
@@ -115,6 +115,8 @@
             },
             options: {
               responsive: true,
+              maintainAspectRatio: false,  // Add this
+              devicePixelRatio: 2,         // Add this
               plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -214,6 +216,8 @@
             },
             options: {
               responsive: true,
+              maintainAspectRatio: false,  // Add this
+              devicePixelRatio: 2,         // Add this
               plugins: {
                 legend: { display: false },
                 tooltip: {
