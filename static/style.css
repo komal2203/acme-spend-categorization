@@ -181,7 +181,7 @@ button:hover {
 .resulttitle {
   display: flex;
   /* margin: 2em; */
-  margin-top: 3em;
+  margin-top: 7em;
   margin-bottom: 2em;
   justify-content: space-between;
   align-items: center;
@@ -190,25 +190,32 @@ button:hover {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  margin-top: 0.5em;
+  margin-top: 0.05em;
   background: #f9fbff;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(79, 139, 249, 0.06);
 }
-.result-table th,
-.result-table td {
+/* .result-table th {
   border: none;
-  padding: 0.3em 0.5em;
+  padding: 0.8em 0.5em;
   text-align: left;
+} */
+.result-table td {
+  color: #3a3a6a;
+  border: none;
+  padding: 0.8em 0.5em;
+  text-align: left;
+  font-size: 1em;
 }
 .result-table th {
   /* background: #e0e7ff; */
   background-color: #163e93;
   color: #ffffff;
-  font-size: 1.1em;
-  padding: 0.6em 0.4em;
-  font-weight: 400;
+  font-size: 1.2em;
+  text-align: left;
+  padding: 0.8em 0.5em;
+  font-weight: 500;
   border-bottom: 2px solid #bfc7d1;
 }
 .result-table tr:nth-child(even) td {
@@ -218,8 +225,7 @@ button:hover {
 .result-table tr:hover td {
   background: #e6f0ff;
   transition: background 0.2s;
-  padding: 0.5em 0.5em;
-
+  padding: 0.8em 0.5em; 
 }
 .table-container {
   max-height: 600px;
@@ -367,6 +373,8 @@ canvas {
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(79, 139, 249, 0.04);
   margin-bottom: 2em;
+  image-rendering: -webkit-optimize-contrast;  /* Add this */
+  image-rendering: crisp-edges;                /* Add this */
 }
 #categoryChart {
   width: 95% !important; /* Force width */
@@ -384,8 +392,8 @@ canvas {
 
 /* Confidence Details Container */
 .confidence-details {
-  margin: 2em auto;
-  max-width: 1200px;
+  margin: 2em 5em;
+  width: 100%;
   padding: 1.5em;
   background: #ffffff;
   border-radius: 8px;
