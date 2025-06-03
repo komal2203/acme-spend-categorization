@@ -1,26 +1,58 @@
 # Python cache
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
 
 # Virtual environments
 venv/
+env/
+ENV/
 .env
+
+# Test files
+tests/test_data/
+tests/results/
 
 # Data outputs and intermediate files
 data/categorized.csv
 data/manual_review.csv
 data/unspsc_cache.json
 data/unspsc_cache.meta
+data/sample_invoices.csv
+data/temp_categorized.csv
 
 # Logs
 logs/
 *.log
+pipeline.log
 
 # System files
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Jupyter / VSCode / IDE configs (if any)
+# Jupyter / VSCode / IDE configs
 .ipynb_checkpoints/
 .vscode/
 *.swp
+*.swo
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Local development
+*.sqlite3
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Render specific
+.render-buildpacks.json

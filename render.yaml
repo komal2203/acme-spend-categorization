@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: acme-spend-categorization
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.8.0  # Changed to 3.8.0 as it's more compatible with your packages
+      - key: OPENAPIKEY  # Changed from OPENAI_API_KEY to OPENAPIKEY
+        sync: false
+
+  - type: cron
+    name: taxonomy-refresh
+    env: python
+    schedule: "0 0 * * *"  # Runs daily at midnight
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/taxonomy_refresh.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.8.0  # Changed to 3.8.0
+      - key: OPENAPIKEY  # Changed from OPENAI_API_KEY to OPENAPIKEY
+        sync: false
