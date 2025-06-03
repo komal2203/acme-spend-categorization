@@ -16,6 +16,12 @@
           ctx.restore();
         },
       });
+
+      // Add initial loader script
+      window.addEventListener('load', function() {
+        const initialLoader = document.getElementById('initial-loader');
+        initialLoader.style.display = 'none';
+      });
     </script>
     <link
       rel="stylesheet"
@@ -23,7 +29,13 @@
     />
   </head>
   <body>
-    <!-- Spinner overlay OUTSIDE container for full-page coverage -->
+    <!-- Initial loader -->
+    <div id="initial-loader" class="spinner">
+      <div class="loader"></div>
+      <div class="spinner-text">Loading Dashboard...</div>
+    </div>
+
+    <!-- Spinner overlay for file processing -->
     <div id="spinner" class="spinner" style="display: none">
       <div class="loader"></div>
       <div class="spinner-text">Processing, please wait...</div>
@@ -114,9 +126,7 @@
               }]
             },
             options: {
-              responsive: true,
-              maintainAspectRatio: false,  // Add this
-              devicePixelRatio: 2,         // Add this
+              responsive: true,            
               plugins: {
                 legend: { display: false },
                 tooltip: {
@@ -216,8 +226,6 @@
             },
             options: {
               responsive: true,
-              maintainAspectRatio: false,  // Add this
-              devicePixelRatio: 2,         // Add this
               plugins: {
                 legend: { display: false },
                 tooltip: {
