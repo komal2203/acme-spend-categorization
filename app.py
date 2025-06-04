@@ -7,7 +7,8 @@ import sys
 import time
 from src.taxonomy_service import unspsc_map
 from src.taxonomy_service import unspsc_dropdown_map
-import mysql.connector
+import psycopg2
+from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -24,8 +25,8 @@ app = Flask(__name__)
 
 # Database configuration
 def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv('DB_HOST', 'localhost'),
+    return psycopg2.connect(
+        host=os.getenv('DB_HOST'),
         user=os.getenv('DB_USER'),
         password=os.getenv('DB_PASSWORD'),
         database=os.getenv('DB_NAME')
@@ -38,7 +39,7 @@ def init_db():
     # Create categorized table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS categorized (
-            invoice_id INT PRIMARY KEY,
+            invoice_id INTEGER PRIMARY KEY,
             description TEXT,
             supplier TEXT,
             commodity_code VARCHAR(8),
@@ -51,7 +52,7 @@ def init_db():
     # Create manual_review table
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS manual_review (
-            invoice_id INT PRIMARY KEY,
+            invoice_id INTEGER PRIMARY KEY,
             description TEXT,
             supplier TEXT,
             commodity_code VARCHAR(8),
@@ -80,7 +81,7 @@ def allowed_file(filename):
 # Helper functions for database operations
 def get_manual_review_data():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM manual_review')
     data = cursor.fetchall()
     cursor.close()
@@ -89,7 +90,7 @@ def get_manual_review_data():
 
 def get_categorized_data():
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     cursor.execute('SELECT * FROM categorized')
     data = cursor.fetchall()
     cursor.close()
@@ -103,11 +104,11 @@ def save_to_categorized(row_data):
         INSERT INTO categorized 
         (invoice_id, description, supplier, commodity_code, commodity_title, confidence, source)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ON DUPLICATE KEY UPDATE
-        commodity_code = VALUES(commodity_code),
-        commodity_title = VALUES(commodity_title),
-        confidence = VALUES(confidence),
-        source = VALUES(source)
+        ON CONFLICT (invoice_id) DO UPDATE SET
+        commodity_code = EXCLUDED.commodity_code,
+        commodity_title = EXCLUDED.commodity_title,
+        confidence = EXCLUDED.confidence,
+        source = EXCLUDED.source
     ''', (
         row_data['invoice_id'],
         row_data['description'],
@@ -148,7 +149,7 @@ def manual_review():
 
         # Get the row from manual_review
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
         cursor.execute('SELECT * FROM manual_review WHERE invoice_id = %s', (invoice_id,))
         row = cursor.fetchone()
         cursor.close()
@@ -316,11 +317,6 @@ def index():
         uploaded_filename=uploaded_filename
     )
 
-# if __name__ == "__main__":
-#     app.run(debug=False)
-
-
-# Add at the end of app.py
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
