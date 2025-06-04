@@ -18,9 +18,6 @@ tests/results/
 # Data outputs and intermediate files
 data/categorized.csv
 data/manual_review.csv
-data/unspsc_cache.json
-data/unspsc_cache.meta
-data/sample_invoices.csv
 data/temp_categorized.csv
 
 # Logs
@@ -33,7 +30,7 @@ pipeline.log
 Thumbs.db
 desktop.ini
 
-# Jupyter / VSCode / IDE configs
+# IDE configs
 .ipynb_checkpoints/
 .vscode/
 *.swp
@@ -56,3 +53,20 @@ build/
 
 # Render specific
 .render-buildpacks.json
+.render.yaml
+
+# Temporary files
+uploads/
+results/
+temp/
+
+# Database
+*.db
+*.sqlite
+
+# Keep these files in data/ (they are essential)
+!data/rules.yaml
+!data/unspsc_full.csv
+!data/unspsc_cache.json
+!data/unspsc_cache.meta
+!data/sample_invoices.csv

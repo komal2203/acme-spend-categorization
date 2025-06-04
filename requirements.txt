@@ -6,7 +6,6 @@ fuzzywuzzy[speedup]
 sentence-transformers==2.2.2
 --find-links https://download.pytorch.org/whl/torch_stable.html
 torch==2.0.1+cpu
-torchvision==0.15.2+cpu
 openai==0.28
 nltk==3.8.1
 faiss-cpu==1.7.4
