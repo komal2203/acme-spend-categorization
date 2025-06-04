@@ -53,6 +53,10 @@
         <span class="modeltime">Model Categorization Time:</span> {{
         "%.2f"|format(elapsed) }} seconds
       </label>
+      {% else %}
+      <label>
+        <span class="modeltime">Model Categorization Time:</span> 0.00 seconds
+      </label>
       {% endif %}
     </form>
 

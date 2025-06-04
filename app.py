@@ -11,6 +11,10 @@ from src.taxonomy_service import unspsc_dropdown_map
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
+import multiprocessing as mp
+import gc
+import psutil
+import concurrent.futures
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -363,7 +367,16 @@ def index():
 
         else:
             logger.info("GET request received")
-            return render_template("index.html")
+            return render_template(
+                "index.html",
+                elapsed=0,  # Set default value
+                chart_data=[],
+                pie_chart_data=[],
+                result_table=None,
+                confidence_pie_data=[],
+                amount_chart_data=[],
+                uploaded_filename=None
+            )
 
         return render_template(
             "index.html",
@@ -381,7 +394,7 @@ def index():
         return render_template(
             "index.html",
             error="An unexpected error occurred. Please try again.",
-            elapsed=None,
+            elapsed=0,  # Set default value
             chart_data=[],
             pie_chart_data=[],
             result_table=None,
