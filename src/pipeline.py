@@ -1,75 +1,179 @@
-import logging, multiprocessing as mp
+import logging
+import multiprocessing as mp
 import pandas as pd
+import time
+import gc
+import psutil 
+import sys
 from src.ingest_sanitize import load_and_clean
 from src.rule_filter import apply_rules
 from src.retrieval import shortlist
 from src.genai_inference import classify_with_ai
 from src.taxonomy_service import unspsc_map
-import time
-import logging
 import concurrent.futures
 
-logging.basicConfig(level=logging.INFO)
-
 # Configure logging
-logging.basicConfig(filename='logs/pipeline.log', level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s')
+logging.basicConfig(
+    filename='logs/pipeline.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Constants
 CONF_THRESH = 0.85
-DATA_PATH   = 'data/sample_invoices.csv'
+DATA_PATH = 'data/sample_invoices.csv'
+CHUNK_SIZE = 50  # Changed from 100 to 50
+MAX_WORKERS = 5  # Added new constant
 
-# Helper for parallel row processing
-def process_row(r):
-    import time
-    desc, supp = r['description'], r['supplier']
-    t0 = time.time()
-    info = apply_rules(desc)
-    rule_time = time.time() - t0
+def check_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    memory_mb = memory_info.rss / 1024 / 1024
+    if memory_mb > 400:  # Alert before hitting 512MB limit
+        logger.warning(f"High memory usage: {memory_mb:.2f} MB")
+    return memory_mb
 
-    src  = 'Rule' if info else 'GenAI'
-    shortlist_time = 0
-    genai_time = 0
+def process_single_row(row):
+    """Process a single row with memory optimization"""
+    try:
+        desc, supp = row['description'], row['supplier']
+        t0 = time.time()
+        
+        # Apply rules
+        info = apply_rules(desc)
+        rule_time = time.time() - t0
 
-    if not info:
-        t1 = time.time()
-        cand = shortlist(desc)
-        shortlist_time = time.time() - t1
+        src = 'Rule' if info else 'GenAI'
+        shortlist_time = 0
+        genai_time = 0
 
-        t2 = time.time()
-        info = classify_with_ai(desc, supp, cand)
-        genai_time = time.time() - t2
+        if not info:
+            t1 = time.time()
+            cand = shortlist(desc)
+            shortlist_time = time.time() - t1
 
-    rec = {**r.to_dict(), **info, 'source':src}
-    target = 'manual' if info['confidence']<CONF_THRESH else 'final'
+            t2 = time.time()
+            info = classify_with_ai(desc, supp, cand)
+            genai_time = time.time() - t2
 
-    # Log timings for this row
-    logging.info(f"Row timings - rule: {rule_time:.2f}s, shortlist: {shortlist_time:.2f}s, genai: {genai_time:.2f}s")
-    return target, rec
+        rec = {**row.to_dict(), **info, 'source': src}
+        target = 'manual' if info['confidence'] < CONF_THRESH else 'final'
 
-# Main pipeline
+        # Log timings
+        logger.info(f"Row timings - rule: {rule_time:.2f}s, shortlist: {shortlist_time:.2f}s, genai: {genai_time:.2f}s")
+        
+        return target, rec
+
+    except Exception as e:
+        logger.error(f"Error processing row: {str(e)}")
+        raise
+
+def process_chunk(chunk):
+    try:
+        final, manual = [], []
+        memory_before = check_memory_usage()
+        
+        with concurrent.futures.ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+            results = list(executor.map(process_single_row, [r for _, r in chunk.iterrows()]))
+        
+        memory_after = check_memory_usage()
+        logger.info(f"Memory change: {memory_after - memory_before:.2f} MB")
+        
+        for tgt, rec in results:
+            (manual if tgt == 'manual' else final).append(rec)
+        
+        return final, manual
+    except Exception as e:
+        logger.error(f"Error processing chunk: {str(e)}")
+        raise
+
+def save_chunk_results(final_chunk, manual_chunk, is_first_chunk=False):
+    """Save chunk results to CSV files"""
+    try:
+        # Save final results
+        if not final_chunk.empty:
+            final_chunk.to_csv(
+                'data/categorized.csv',
+                mode='w' if is_first_chunk else 'a',
+                header=is_first_chunk,
+                index=False
+            )
+        
+        # Save manual review results
+        if not manual_chunk.empty:
+            manual_chunk.to_csv(
+                'data/manual_review.csv',
+                mode='w' if is_first_chunk else 'a',
+                header=is_first_chunk,
+                index=False
+            )
+            
+    except Exception as e:
+        logger.error(f"Error saving chunk results: {str(e)}")
+        raise
 
 def run_pipeline():
-    total_start = time.time()
-    t0 = time.time()
-    df = load_and_clean(DATA_PATH)
-    print("Running pipeline...")
-    logging.info(f"Data loading/cleaning took {time.time() - t0:.2f} seconds")
-    t1 = time.time()
-    final, manual = [], []
-    logging.info(f"Business rule application took {time.time() - t1:.2f} seconds")
+    """Main pipeline with memory optimization"""
+    try:
+        total_start = time.time()
+        logger.info("Starting pipeline...")
+        initial_memory = check_memory_usage()
+        logger.info(f"Initial memory usage: {initial_memory:.2f} MB")
 
-    t2 = time.time()
-    # Use ThreadPoolExecutor for parallel GenAI calls
-    with concurrent.futures.ThreadPoolExecutor(max_workers=30) as executor:
-        results = list(executor.map(process_row, [r for _, r in df.iterrows()]))
-    for tgt, rec in results:
-        (manual if tgt=='manual' else final).append(rec)
-    logging.info(f"GenAI inference took {time.time() - t2:.2f} seconds")
+        # Load and clean data
+        t0 = time.time()
+        df = load_and_clean(DATA_PATH)
+        logger.info(f"Data loading/cleaning took {time.time() - t0:.2f} seconds")
+        logger.info(f"Memory after loading: {check_memory_usage():.2f} MB")
 
-    t3 = time.time()
-    pd.DataFrame(final).to_csv('data/categorized.csv',index=False)
-    pd.DataFrame(manual).to_csv('data/manual_review.csv',index=False)
-    logging.info(f"Pipeline done: {len(final)} final, {len(manual)} manual")
-    logging.info(f"Output writing took {time.time() - t3:.2f} seconds")
-    logging.info(f"Total pipeline time: {time.time() - total_start:.2f} seconds")
-    
-if __name__=='__main__': run_pipeline()
+        # Process in chunks
+        total_final = 0
+        total_manual = 0
+        is_first_chunk = True
+
+        for chunk in pd.read_csv(DATA_PATH, chunksize=CHUNK_SIZE):
+            # Process chunk
+            t1 = time.time()
+            final_chunk, manual_chunk = process_chunk(chunk)
+            logger.info(f"Chunk processing took {time.time() - t1:.2f} seconds")
+
+            # Save results
+            t2 = time.time()
+            save_chunk_results(
+                pd.DataFrame(final_chunk),
+                pd.DataFrame(manual_chunk),
+                is_first_chunk
+            )
+            logger.info(f"Chunk saving took {time.time() - t2:.2f} seconds")
+
+            # Update counts
+            total_final += len(final_chunk)
+            total_manual += len(manual_chunk)
+
+            # Clean up
+            del final_chunk, manual_chunk
+            gc.collect()
+            logger.info(f"Memory after cleanup: {check_memory_usage():.2f} MB")
+
+            is_first_chunk = False
+
+        # Log final statistics
+        final_memory = check_memory_usage()
+        logger.info(f"Pipeline completed:")
+        logger.info(f"- Total final records: {total_final}")
+        logger.info(f"- Total manual review records: {total_manual}")
+        logger.info(f"- Total pipeline time: {time.time() - total_start:.2f} seconds")
+        logger.info(f"- Final memory usage: {final_memory:.2f} MB")
+        logger.info(f"- Memory change: {final_memory - initial_memory:.2f} MB")
+
+    except Exception as e:
+        logger.error(f"Error in pipeline: {str(e)}")
+        raise
+
+if __name__ == '__main__':
+    try:
+        run_pipeline()
+    except Exception as e:
+        logger.error(f"Pipeline failed: {str(e)}")
+        sys.exit(1)

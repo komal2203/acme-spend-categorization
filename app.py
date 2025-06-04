@@ -1,380 +1,200 @@
 import os
-import pandas as pd
-from flask import Flask, render_template, request, send_from_directory, redirect
-from werkzeug.utils import secure_filename
-import subprocess
 import sys
 import time
+import gc
+import psutil
 import logging
-from src.taxonomy_service import unspsc_map
-from src.taxonomy_service import unspsc_dropdown_map
-import psycopg2
-from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
+import subprocess
+from flask import Flask, request, render_template, jsonify
+from werkzeug.utils import secure_filename
+import pandas as pd
+import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-
-def prettify_column(col):
-    return ' '.join(word.capitalize() for word in col.split('_'))
-
-UPLOAD_FOLDER = 'uploads'
-RESULTS_FOLDER = 'results'
-ALLOWED_EXTENSIONS = {'csv'}
-
+# Initialize Flask app
 app = Flask(__name__)
 
-# Database configuration
-def get_db_connection():
-    try:
-        return psycopg2.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
-        )
-    except Exception as e:
-        logger.error(f"Database connection error: {str(e)}")
-        raise
-
-def init_db():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Create categorized table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS categorized (
-                invoice_id INTEGER PRIMARY KEY,
-                description TEXT,
-                supplier TEXT,
-                commodity_code VARCHAR(8),
-                commodity_title TEXT,
-                confidence FLOAT,
-                source VARCHAR(50)
-            )
-        ''')
-        
-        # Create manual_review table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS manual_review (
-                invoice_id INTEGER PRIMARY KEY,
-                description TEXT,
-                supplier TEXT,
-                commodity_code VARCHAR(8),
-                commodity_title TEXT,
-                confidence FLOAT,
-                source VARCHAR(50)
-            )
-        ''')
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-        logger.info("Database initialized successfully")
-    except Exception as e:
-        logger.error(f"Database initialization error: {str(e)}")
-        raise
-
-# Initialize database on startup
-init_db()
-
+# Configure upload folder
+UPLOAD_FOLDER = 'data'
+ALLOWED_EXTENSIONS = {'csv'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
+# Ensure upload folder exists
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(RESULTS_FOLDER, exist_ok=True)
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Helper functions for database operations
-def get_manual_review_data():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM manual_review')
-        data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return data
-    except Exception as e:
-        logger.error(f"Error fetching manual review data: {str(e)}")
-        return []
+def log_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory_info = process.memory_info()
+    logger.info(f"Memory usage: {memory_info.rss / 1024 / 1024:.2f} MB")
 
 def get_categorized_data():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM categorized')
-        data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return data
+        # Read the processed data from your ML pipeline output
+        # This should match your pipeline's output format
+        with open('data/processed_results.json', 'r') as f:
+            return json.load(f)
     except Exception as e:
-        logger.error(f"Error fetching categorized data: {str(e)}")
+        logger.error(f"Error reading categorized data: {str(e)}")
         return []
 
-def save_to_categorized(row_data):
+def calculate_chart_data(df):
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO categorized 
-            (invoice_id, description, supplier, commodity_code, commodity_title, confidence, source)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (invoice_id) DO UPDATE SET
-            commodity_code = EXCLUDED.commodity_code,
-            commodity_title = EXCLUDED.commodity_title,
-            confidence = EXCLUDED.confidence,
-            source = EXCLUDED.source
-        ''', (
-            row_data['invoice_id'],
-            row_data['description'],
-            row_data['supplier'],
-            row_data['commodity_code'],
-            row_data['commodity_title'],
-            row_data['confidence'],
-            row_data.get('source', 'Manual')
-        ))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        logger.info(f"Successfully saved invoice {row_data['invoice_id']} to categorized")
-    except Exception as e:
-        logger.error(f"Error saving to categorized: {str(e)}")
-        raise
-
-def remove_from_manual_review(invoice_id):
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM manual_review WHERE invoice_id = %s', (invoice_id,))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        logger.info(f"Successfully removed invoice {invoice_id} from manual review")
-    except Exception as e:
-        logger.error(f"Error removing from manual review: {str(e)}")
-        raise
-
-@app.route("/manual_review", methods=["GET", "POST"])
-def manual_review():
-    try:
-        data = get_manual_review_data()
-        
-        if not data:
-            return render_template(
-                "manual_review.html",
-                data=[],
-                unspsc_dropdown_map=unspsc_dropdown_map,
-                error="No invoices to review!"
-            )
-
-        if request.method == "POST":
-            invoice_id = int(request.form.get("invoice_id"))
-            corrected_code = request.form.get("corrected_code")
-
-            conn = get_db_connection()
-            cursor = conn.cursor(cursor_factory=RealDictCursor)
-            cursor.execute('SELECT * FROM manual_review WHERE invoice_id = %s', (invoice_id,))
-            row = cursor.fetchone()
-            cursor.close()
-            conn.close()
-
-            if row:
-                row['commodity_code'] = corrected_code
-                row['commodity_title'] = unspsc_dropdown_map[corrected_code]
-                row['confidence'] = 1.0
-                row['source'] = 'Manual'
-
-                save_to_categorized(row)
-                remove_from_manual_review(invoice_id)
-
-                return render_template(
-                    "manual_review.html",
-                    data=get_manual_review_data(),
-                    unspsc_dropdown_map=unspsc_dropdown_map,
-                    success=True,
-                    download_link="/download_categorized"
-                )
-
-        return render_template(
-            "manual_review.html",
-            data=data,
-            unspsc_dropdown_map=unspsc_dropdown_map
-        )
-    except Exception as e:
-        logger.error(f"Error in manual_review route: {str(e)}")
-        return render_template(
-            "manual_review.html",
-            error="An error occurred. Please try again.",
-            data=[],
-            unspsc_dropdown_map=unspsc_dropdown_map
-        )
-
-@app.route("/download_categorized")
-def download_categorized():
-    try:
-        data = get_categorized_data()
-        df = pd.DataFrame(data)
-        
-        df.columns = [prettify_column(c) for c in df.columns]
-        if 'Confidence Rounded' in df.columns:
-            df = df.drop(columns=['Confidence Rounded'])
-        df = df.rename(columns={
-            "Commodity Title": "UNSPSC Category Name",
-            "Commodity Code": "UNSPSC Category ID"
-        })
-        
-        temp_path = "data/temp_categorized.csv"
-        df.to_csv(temp_path, index=False)
-        try:
-            return send_from_directory(directory="data", path="temp_categorized.csv", as_attachment=True)
-        finally:
-            try:
-                os.remove(temp_path)
-            except:
-                pass
-    except Exception as e:
-        logger.error(f"Error in download_categorized: {str(e)}")
-        return render_template("index.html", error="Error downloading file. Please try again.")
-
-@app.route("/download_manual")
-def download_manual():
-    try:
-        data = get_manual_review_data()
-        df = pd.DataFrame(data)
-        
-        temp_path = "data/temp_manual.csv"
-        df.to_csv(temp_path, index=False)
-        try:
-            return send_from_directory(directory="data", path="temp_manual.csv", as_attachment=True)
-        finally:
-            try:
-                os.remove(temp_path)
-            except:
-                pass
-    except Exception as e:
-        logger.error(f"Error in download_manual: {str(e)}")
-        return render_template("index.html", error="Error downloading file. Please try again.")
-
-@app.route("/", methods=["GET", "POST"])
-def index():
-    try:
-        result_table = None
+        # Calculate chart data based on your requirements
         chart_data = []
         pie_chart_data = []
         confidence_pie_data = []
         amount_chart_data = []
-        error = None
-        elapsed = None
-        uploaded_filename = None
+        
+        # Example calculations (modify based on your needs):
+        if not df.empty:
+            # Category distribution
+            category_counts = df['category'].value_counts().to_dict()
+            pie_chart_data = [{'name': k, 'value': v} for k, v in category_counts.items()]
+            
+            # Confidence distribution
+            confidence_counts = df['confidence'].value_counts().to_dict()
+            confidence_pie_data = [{'name': k, 'value': v} for k, v in confidence_counts.items()]
+            
+            # Amount by category
+            amount_by_category = df.groupby('category')['amount'].sum().to_dict()
+            amount_chart_data = [{'name': k, 'value': v} for k, v in amount_by_category.items()]
+            
+            # Time series or other chart data
+            chart_data = []  # Implement based on your needs
+            
+        return chart_data, pie_chart_data, confidence_pie_data, amount_chart_data
+    except Exception as e:
+        logger.error(f"Error calculating chart data: {str(e)}")
+        return [], [], [], []
 
+@app.route("/", methods=["GET", "POST"])
+def index():
+    try:
         if request.method == "POST":
+            start_time = time.time()
+            log_memory_usage()
+            
             if 'invoice_file' not in request.files:
-                return render_template(
-                    "index.html",
-                    error="No file uploaded",
-                    elapsed=elapsed,
-                    chart_data=chart_data,
-                    pie_chart_data=pie_chart_data,
-                    result_table=result_table,
-                    confidence_pie_data=confidence_pie_data,
-                    amount_chart_data=amount_chart_data,
-                    uploaded_filename=uploaded_filename
-                )
+                return render_template("index.html", error="No file uploaded")
 
             invoice_file = request.files['invoice_file']
-
+            
             if not invoice_file or not allowed_file(invoice_file.filename):
-                error = "Please upload a valid invoice CSV file."
-                return render_template(
-                    "index.html",
-                    error=error,
-                    elapsed=elapsed,
-                    chart_data=chart_data,
-                    pie_chart_data=pie_chart_data,
-                    result_table=result_table,
-                    confidence_pie_data=confidence_pie_data,
-                    amount_chart_data=amount_chart_data,
-                    uploaded_filename=uploaded_filename
-                )
+                return render_template("index.html", error="Please upload a valid CSV file")
 
+            # Save file
             uploaded_filename = secure_filename(invoice_file.filename)
             invoice_path = os.path.join(app.config['UPLOAD_FOLDER'], uploaded_filename)
             invoice_file.save(invoice_path)
-
-            # Move uploaded file to data/sample_invoices.csv
             os.replace(invoice_path, "data/sample_invoices.csv")
 
-            # Time logging start
-            start_time = time.time()
+            # Clean up before ML processing
+            gc.collect()
+            log_memory_usage()
 
-            # Run the pipeline
-            result = subprocess.run(
-                [sys.executable, "-m", "src.pipeline"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            try:
+                # Run pipeline with memory limits
+                result = subprocess.run(
+                    [sys.executable, "-m", "src.pipeline"],
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    text=True,
+                    timeout=300,
+                    env={
+                        **os.environ,
+                        'PYTHONUNBUFFERED': '1',
+                        'PYTHONMALLOC': 'malloc',
+                        'PYTHONMALLOCSTATS': '1'
+                    }
+                )
+                
+                # Clean up after ML processing
+                gc.collect()
+                log_memory_usage()
 
-            # Time logging end
-            elapsed = time.time() - start_time
-            logger.info(f"Model pipeline execution time: {elapsed:.2f} seconds")
+                if result.returncode != 0:
+                    error_msg = f"Error in processing: {result.stderr}"
+                    logger.error(error_msg)
+                    return render_template(
+                        "index.html",
+                        error=error_msg,
+                        elapsed=None,
+                        chart_data=[],
+                        pie_chart_data=[],
+                        result_table=None,
+                        confidence_pie_data=[],
+                        amount_chart_data=[],
+                        uploaded_filename=None
+                    )
 
-            if result.returncode != 0:
-                error = f"Error running categorization pipeline: {result.stderr}"
-                logger.error(error)
+                # Get results in chunks
+                data = get_categorized_data()
+                result_df = pd.DataFrame(data)
+
+                if not result_df.empty:
+                    # Process results in chunks
+                    chunk_size = 100
+                    result_table = []
+                    for i in range(0, len(result_df), chunk_size):
+                        chunk = result_df[i:i + chunk_size]
+                        result_table.extend(chunk.to_dict(orient='records'))
+                        gc.collect()
+
+                    # Calculate chart data
+                    chart_data, pie_chart_data, confidence_pie_data, amount_chart_data = calculate_chart_data(result_df)
+
+                    return render_template(
+                        "index.html",
+                        result_table=result_table,
+                        elapsed=time.time() - start_time,
+                        chart_data=chart_data,
+                        pie_chart_data=pie_chart_data,
+                        confidence_pie_data=confidence_pie_data,
+                        amount_chart_data=amount_chart_data,
+                        uploaded_filename=uploaded_filename
+                    )
+
+            except subprocess.TimeoutExpired:
+                logger.error("ML pipeline timed out")
                 return render_template(
                     "index.html",
-                    error=error,
-                    elapsed=elapsed,
-                    chart_data=chart_data,
-                    pie_chart_data=pie_chart_data,
-                    result_table=result_table,
-                    amount_chart_data=amount_chart_data,
-                    confidence_pie_data=confidence_pie_data,
-                    uploaded_filename=uploaded_filename
+                    error="Processing took too long. Please try again with a smaller file.",
+                    elapsed=None,
+                    chart_data=[],
+                    pie_chart_data=[],
+                    result_table=None,
+                    confidence_pie_data=[],
+                    amount_chart_data=[],
+                    uploaded_filename=None
+                )
+            except Exception as e:
+                logger.error(f"Error in ML pipeline: {str(e)}")
+                return render_template(
+                    "index.html",
+                    error="An error occurred during processing. Please try again.",
+                    elapsed=None,
+                    chart_data=[],
+                    pie_chart_data=[],
+                    result_table=None,
+                    confidence_pie_data=[],
+                    amount_chart_data=[],
+                    uploaded_filename=None
                 )
 
-            # Get data from database for display
-            data = get_categorized_data()
-            result_df = pd.DataFrame(data)
+        return render_template("index.html")
 
-            if not result_df.empty:
-                confidence_col = 'confidence'
-                source_col = 'source'
-
-                if confidence_col in result_df.columns:
-                    temp_df = result_df.copy()
-                    temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
-                    
-                    # Your existing chart creation code here
-                    # ... (keep all your chart creation code)
-
-                result_table = result_df.to_dict(orient='records')
-
-        return render_template(
-            "index.html",
-            error=error,
-            elapsed=elapsed,
-            chart_data=chart_data,
-            pie_chart_data=pie_chart_data,
-            result_table=result_table,
-            confidence_pie_data=confidence_pie_data,
-            amount_chart_data=amount_chart_data,
-            uploaded_filename=uploaded_filename
-        )
     except Exception as e:
         logger.error(f"Error in index route: {str(e)}")
         return render_template(
             "index.html",
-            error="An error occurred. Please try again.",
+            error="An unexpected error occurred. Please try again.",
             elapsed=None,
             chart_data=[],
             pie_chart_data=[],
@@ -384,6 +204,19 @@ def index():
             uploaded_filename=None
         )
 
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return render_template(
+        "index.html",
+        error="File too large. Maximum file size is 16MB.",
+        elapsed=None,
+        chart_data=[],
+        pie_chart_data=[],
+        result_table=None,
+        confidence_pie_data=[],
+        amount_chart_data=[],
+        uploaded_filename=None
+    )
+
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 10000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=10000)
