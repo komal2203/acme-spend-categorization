@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: acme-spend-categorization
+    env: python
+    buildCommand: |
+      python -m venv venv
+      source venv/bin/activate
+      pip install -r requirements.txt
+    startCommand: |
+      source venv/bin/activate
+      gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+      - key: OPENAPIKEY
+        sync: false
+      - key: DB_HOST
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: DB_NAME
+        sync: false
