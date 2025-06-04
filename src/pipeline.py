@@ -11,6 +11,7 @@ from src.retrieval import shortlist
 from src.genai_inference import classify_with_ai
 from src.taxonomy_service import unspsc_map
 import concurrent.futures
+from model_optimization import load_model_efficiently, monitor_memory
 
 # Configure logging
 logging.basicConfig(
@@ -26,12 +27,14 @@ DATA_PATH = 'data/sample_invoices.csv'
 CHUNK_SIZE = 10  # Smaller chunks
 MAX_WORKERS = 2  # Fewer workers
 
-# Cache model
+# Global model variable
 model = None
+
 def get_model():
+    """Get or load the optimized model"""
     global model
     if model is None:
-        model = load_model()  # Load once
+        model = load_model_efficiently('your_model_path')
     return model
 
 def check_memory_usage():
@@ -45,33 +48,25 @@ def check_memory_usage():
 def process_single_row(row):
     """Process a single row with memory optimization"""
     try:
+        # Monitor memory before processing
+        monitor_memory()
+        
+        # Get optimized model
+        model = get_model()
+        
+        # Your existing processing code
         desc, supp = row['description'], row['supplier']
-        t0 = time.time()
         
-        # Apply rules
+        # Process with optimized model
         info = apply_rules(desc)
-        rule_time = time.time() - t0
-
-        src = 'Rule' if info else 'GenAI'
-        shortlist_time = 0
-        genai_time = 0
-
-        if not info:
-            t1 = time.time()
-            cand = shortlist(desc)
-            shortlist_time = time.time() - t1
-
-            t2 = time.time()
-            info = classify_with_ai(desc, supp, cand)
-            genai_time = time.time() - t2
-
-        rec = {**row.to_dict(), **info, 'source': src}
-        target = 'manual' if info['confidence'] < CONF_THRESH else 'final'
-
-        # Log timings
-        logger.info(f"Row timings - rule: {rule_time:.2f}s, shortlist: {shortlist_time:.2f}s, genai: {genai_time:.2f}s")
         
-        return target, rec
+        # Monitor memory after processing
+        monitor_memory()
+        
+        # Clear memory
+        gc.collect()
+        
+        return info
 
     except Exception as e:
         logger.error(f"Error processing row: {str(e)}")

@@ -15,6 +15,7 @@ import multiprocessing as mp
 import gc
 import psutil
 import concurrent.futures
+from model_optimization import monitor_memory
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -456,6 +457,22 @@ def internal_error(error):
         amount_chart_data=[],
         uploaded_filename=None
     )
+
+@app.before_request
+def before_request():
+    """Monitor memory before each request"""
+    monitor_memory()
+
+@app.after_request
+def after_request(response):
+    """Clear memory after each request"""
+    gc.collect()
+    return response
+
+def log_memory_usage():
+    process = psutil.Process(os.getpid())
+    memory = process.memory_info().rss / 1024 / 1024
+    logger.info(f"Current memory usage: {memory:.2f} MB")
 
 if __name__ == "__main__":
     try:

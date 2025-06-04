@@ -1,5 +1,7 @@
 # Core ML and Data Processing
-torch==2.0.1
+torch==2.6.0
+torchvision==0.21.0
+torchaudio==2.6.0
 transformers==4.30.2
 sentence-transformers==2.2.2
 huggingface-hub==0.16.4
@@ -33,3 +35,7 @@ pytz==2023.3
 
 # Visualization (if needed)
 matplotlib==3.7.2
+
+
+onnx==1.14.0
+onnxruntime==1.15.1
