@@ -23,8 +23,16 @@ logger = logging.getLogger(__name__)
 # Constants
 CONF_THRESH = 0.85
 DATA_PATH = 'data/sample_invoices.csv'
-CHUNK_SIZE = 50  # Changed from 100 to 50
-MAX_WORKERS = 5  # Added new constant
+CHUNK_SIZE = 10  # Smaller chunks
+MAX_WORKERS = 2  # Fewer workers
+
+# Cache model
+model = None
+def get_model():
+    global model
+    if model is None:
+        model = load_model()  # Load once
+    return model
 
 def check_memory_usage():
     process = psutil.Process(os.getpid())
@@ -113,6 +121,15 @@ def save_chunk_results(final_chunk, manual_chunk, is_first_chunk=False):
         logger.error(f"Error saving chunk results: {str(e)}")
         raise
 
+def process_row(row):
+    result = process_single_row(row)
+    gc.collect()  # Clean after each row
+    return result
+
+def process_file(file_path):
+    for chunk in pd.read_csv(file_path, chunksize=10):
+        yield process_chunk(chunk)
+
 def run_pipeline():
     """Main pipeline with memory optimization"""
     try:
@@ -170,6 +187,16 @@ def run_pipeline():
     except Exception as e:
         logger.error(f"Error in pipeline: {str(e)}")
         raise
+
+def save_results(results):
+    with open('results.csv', 'a') as f:
+        for result in results:
+            f.write(f"{result}\n")
+
+def log_memory():
+    process = psutil.Process()
+    memory = process.memory_info().rss / 1024 / 1024
+    logger.info(f"Memory usage: {memory:.2f} MB")
 
 if __name__ == '__main__':
     try:
