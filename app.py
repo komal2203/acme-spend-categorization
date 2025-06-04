@@ -8,8 +8,6 @@ import time
 import logging
 from src.taxonomy_service import unspsc_map
 from src.taxonomy_service import unspsc_dropdown_map
-import psycopg2
-from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 import multiprocessing as mp
 import gc
@@ -33,60 +31,65 @@ ALLOWED_EXTENSIONS = {'csv'}
 
 app = Flask(__name__)
 
-# Database configuration
-def get_db_connection():
-    try:
-        return psycopg2.connect(
-            host=os.getenv('DB_HOST'),
-            user=os.getenv('DB_USER'),
-            password=os.getenv('DB_PASSWORD'),
-            database=os.getenv('DB_NAME')
-        )
-    except Exception as e:
-        logger.error(f"Database connection error: {str(e)}")
-        raise
+# Comment out these imports
+# import psycopg2
+# from psycopg2.extras import RealDictCursor
 
-def init_db():
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        
-        # Create categorized table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS categorized (
-                invoice_id INTEGER PRIMARY KEY,
-                description TEXT,
-                supplier TEXT,
-                commodity_code VARCHAR(8),
-                commodity_title TEXT,
-                confidence FLOAT,
-                source VARCHAR(50)
-            )
-        ''')
-        
-        # Create manual_review table
-        cursor.execute('''
-            CREATE TABLE IF NOT EXISTS manual_review (
-                invoice_id INTEGER PRIMARY KEY,
-                description TEXT,
-                supplier TEXT,
-                commodity_code VARCHAR(8),
-                commodity_title TEXT,
-                confidence FLOAT,
-                source VARCHAR(50)
-            )
-        ''')
-        
-        conn.commit()
-        cursor.close()
-        conn.close()
-        logger.info("Database initialized successfully")
-    except Exception as e:
-        logger.error(f"Database initialization error: {str(e)}")
-        raise
+# Comment out database connection function
+# def get_db_connection():
+#     try:
+#         return psycopg2.connect(
+#             host=os.getenv('DB_HOST'),
+#             user=os.getenv('DB_USER'),
+#             password=os.getenv('DB_PASSWORD'),
+#             database=os.getenv('DB_NAME')
+#         )
+#     except Exception as e:
+#         logger.error(f"Database connection error: {str(e)}")
+#         raise
 
-# Initialize database on startup
-init_db()
+# Comment out database initialization
+# def init_db():
+#     try:
+#         conn = get_db_connection()
+#         cursor = conn.cursor()
+#         
+#         # Create categorized table
+#         cursor.execute('''
+#             CREATE TABLE IF NOT EXISTS categorized (
+#                 invoice_id INTEGER PRIMARY KEY,
+#                 description TEXT,
+#                 supplier TEXT,
+#                 commodity_code VARCHAR(8),
+#                 commodity_title TEXT,
+#                 confidence FLOAT,
+#                 source VARCHAR(50)
+#             )
+#         ''')
+#         
+#         # Create manual_review table
+#         cursor.execute('''
+#             CREATE TABLE IF NOT EXISTS manual_review (
+#                 invoice_id INTEGER PRIMARY KEY,
+#                 description TEXT,
+#                 supplier TEXT,
+#                 commodity_code VARCHAR(8),
+#                 commodity_title TEXT,
+#                 confidence FLOAT,
+#                 source VARCHAR(50)
+#             )
+#         ''')
+#         
+#         conn.commit()
+#         cursor.close()
+#         conn.close()
+#         logger.info("Database initialized successfully")
+#     except Exception as e:
+#         logger.error(f"Database initialization error: {str(e)}")
+#         raise
+
+# Comment out database initialization call
+# init_db()
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULTS_FOLDER'] = RESULTS_FOLDER
@@ -97,58 +100,32 @@ os.makedirs(RESULTS_FOLDER, exist_ok=True)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Helper functions for database operations
+# Add these functions to replace database operations
 def get_manual_review_data():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM manual_review')
-        data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return data
+        if os.path.exists('data/manual_review.csv'):
+            return pd.read_csv('data/manual_review.csv').to_dict('records')
+        return []
     except Exception as e:
-        logger.error(f"Error fetching manual review data: {str(e)}")
+        logger.error(f"Error reading manual review data: {str(e)}")
         return []
 
 def get_categorized_data():
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
-        cursor.execute('SELECT * FROM categorized')
-        data = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return data
+        if os.path.exists('data/categorized.csv'):
+            return pd.read_csv('data/categorized.csv').to_dict('records')
+        return []
     except Exception as e:
-        logger.error(f"Error fetching categorized data: {str(e)}")
+        logger.error(f"Error reading categorized data: {str(e)}")
         return []
 
 def save_to_categorized(row_data):
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('''
-            INSERT INTO categorized 
-            (invoice_id, description, supplier, commodity_code, commodity_title, confidence, source)
-            VALUES (%s, %s, %s, %s, %s, %s, %s)
-            ON CONFLICT (invoice_id) DO UPDATE SET
-            commodity_code = EXCLUDED.commodity_code,
-            commodity_title = EXCLUDED.commodity_title,
-            confidence = EXCLUDED.confidence,
-            source = EXCLUDED.source
-        ''', (
-            row_data['invoice_id'],
-            row_data['description'],
-            row_data['supplier'],
-            row_data['commodity_code'],
-            row_data['commodity_title'],
-            row_data['confidence'],
-            row_data.get('source', 'Manual')
-        ))
-        conn.commit()
-        cursor.close()
-        conn.close()
+        df = pd.DataFrame([row_data])
+        if os.path.exists('data/categorized.csv'):
+            existing_df = pd.read_csv('data/categorized.csv')
+            df = pd.concat([existing_df, df], ignore_index=True)
+        df.to_csv('data/categorized.csv', index=False)
         logger.info(f"Successfully saved invoice {row_data['invoice_id']} to categorized")
     except Exception as e:
         logger.error(f"Error saving to categorized: {str(e)}")
@@ -156,13 +133,11 @@ def save_to_categorized(row_data):
 
 def remove_from_manual_review(invoice_id):
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute('DELETE FROM manual_review WHERE invoice_id = %s', (invoice_id,))
-        conn.commit()
-        cursor.close()
-        conn.close()
-        logger.info(f"Successfully removed invoice {invoice_id} from manual review")
+        if os.path.exists('data/manual_review.csv'):
+            df = pd.read_csv('data/manual_review.csv')
+            df = df[df['invoice_id'] != invoice_id]
+            df.to_csv('data/manual_review.csv', index=False)
+            logger.info(f"Successfully removed invoice {invoice_id} from manual review")
     except Exception as e:
         logger.error(f"Error removing from manual review: {str(e)}")
         raise
@@ -170,7 +145,8 @@ def remove_from_manual_review(invoice_id):
 @app.route("/manual_review", methods=["GET", "POST"])
 def manual_review():
     try:
-        data = get_manual_review_data()
+        # Comment out these lines
+        # data = get_manual_review_data()
         
         if not data:
             return render_template(
@@ -184,12 +160,13 @@ def manual_review():
             invoice_id = int(request.form.get("invoice_id"))
             corrected_code = request.form.get("corrected_code")
 
-            conn = get_db_connection()
-            cursor = conn.cursor(cursor_factory=RealDictCursor)
-            cursor.execute('SELECT * FROM manual_review WHERE invoice_id = %s', (invoice_id,))
-            row = cursor.fetchone()
-            cursor.close()
-            conn.close()
+            # Comment out these lines
+            # conn = get_db_connection()
+            # cursor = conn.cursor(cursor_factory=RealDictCursor)
+            # cursor.execute('SELECT * FROM manual_review WHERE invoice_id = %s', (invoice_id,))
+            # row = cursor.fetchone()
+            # cursor.close()
+            # conn.close()
 
             if row:
                 row['commodity_code'] = corrected_code
@@ -197,8 +174,9 @@ def manual_review():
                 row['confidence'] = 1.0
                 row['source'] = 'Manual'
 
-                save_to_categorized(row)
-                remove_from_manual_review(invoice_id)
+                # Comment out these lines
+                # save_to_categorized(row)
+                # remove_from_manual_review(invoice_id)
 
                 return render_template(
                     "manual_review.html",
@@ -410,7 +388,9 @@ def ensure_directories():
         'data',
         'logs',
         'static',
-        'templates'
+        'templates',
+        'uploads',
+        'results'
     ]
     for directory in directories:
         os.makedirs(directory, exist_ok=True)
