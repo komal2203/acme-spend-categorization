@@ -1,0 +1,6 @@
+Invoice Id,Supplier,Sku,Managing Account,Amount,Description,Segment Code,Segment Title,Family Code,Family Title,Class Code,Class Title,"UNSPSC 
+Category ID
+","UNSPSC
+Category
+Name",Confidence,Source
+4,Acme Supplies,Wheat seeds,Account1,$850,vegetable seeds,A,"Raw Materials, Chemicals, Paper, Fuel",10000000,Live Plant and Animal Material and Accessories and Supplies,10150000,Seeds and bulbs and seedlings and cuttings,10151500,Vegetable seeds and seedlings,0.95,GenAI
