@@ -1,6 +1,6 @@
 # gunicorn_config.py
 bind = "0.0.0.0:10000"
-timeout = 600  # 10 minutes
+timeout = 1200  
 workers = 1
 worker_class = 'sync'
 keepalive = 5
