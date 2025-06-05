@@ -54,9 +54,7 @@ This system processes invoice-level data to categorize spend items according to 
 
 ## 🧪 Usage
 
-1. **Run Full Pipeline**
-
-   - Processes invoices and writes outputs:
+1. **Run Full Pipeline** - Processes invoices and writes outputs
 
    ```bash
    python src/08_pipeline.py
