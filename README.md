@@ -29,8 +29,8 @@ This system processes invoice-level data to categorize spend items according to 
 
 ## ⚙️ Prerequisites
 
-- Python 3.9+
-- [OpenAI API Key](https://platform.openai.com/account/api-keys)
+   - Python 3.9+
+   - [OpenAI API Key](https://platform.openai.com/account/api-keys)
 
 ---
 
@@ -84,53 +84,52 @@ Prepare your invoice CSV like this:
 ---
 
 ## 🌐 Web UI (Optional)
+   - To run a lightweight Flask interface:
 
-To run a lightweight Flask interface:
-
-```bash
-python app.py
-```
-Then navigate to http://localhost:5000 (Flask).
+     ````bash
+     python app.py
+     ````
+   - Then navigate to http://localhost:5000 (Flask).
 
 ---
 
 ## 🧠 How It Works
-- Sanitization: Cleans and normalizes invoice text
-- Rule Matching: Applies analyst-defined keyword rules
-- Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
-- AI Selection: GPT-4 picks the most likely UNSPSC code
-- Confidence Routing: Items below threshold are queued for manual review
+   - Sanitization: Cleans and normalizes invoice text
+   - Rule Matching: Applies analyst-defined keyword rules
+   - Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
+   - AI Selection: GPT-4 picks the most likely UNSPSC code
+   - Confidence Routing: Items below threshold are queued for manual review
 
 ---
 
 ## Performance & Monitoring
-- Multi-core parallel processing via multiprocessing
-- Confidence-based classification routing
-- Logs available in logs/pipeline.log
+   - Multi-core parallel processing via multiprocessing
+   - Confidence-based classification routing
+   - Logs available in logs/pipeline.log
 
 ---
 
 
 ## 📅 Roadmap
-- More robust rule engine (regex, entity recognition)
-- Spend analytics dashboard
-- RESTful API endpoints for integration
-- Scheduled batch job manager
-- Mobile-friendly UI
+   - More robust rule engine (regex, entity recognition)
+   - Spend analytics dashboard
+   - RESTful API endpoints for integration
+   - Scheduled batch job manager
+   - Mobile-friendly UI
 
 ---
 
 ## 🤝 Collaborators
-- Subhav Jain
-- Sidhant Budhiraja
-- Komal Meena
-- Prayash Pandey
+   - Subhav Jain
+   - Sidhant Budhiraja
+   - Komal Meena
+   - Prayash Pandey
 
 ---
 
 ## 📚 Acknowledgments
-- OpenAI for powerful AI APIs
-- UNSPSC.org for the classification taxonomy
-- Sentence-Transformers for semantic search
+   - OpenAI for powerful AI APIs
+   - UNSPSC.org for the classification taxonomy
+   - Sentence-Transformers for semantic search
 
 
