@@ -96,7 +96,7 @@ Then navigate to http://localhost:5000 (Flask).
 
 ---
 
-##🧠 How It Works
+## 🧠 How It Works
 - Sanitization: Cleans and normalizes invoice text
 - Rule Matching: Applies analyst-defined keyword rules
 - Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
@@ -113,7 +113,7 @@ Then navigate to http://localhost:5000 (Flask).
 ---
 
 
-##📅 Roadmap
+## 📅 Roadmap
 - More robust rule engine (regex, entity recognition)
 - Spend analytics dashboard
 - RESTful API endpoints for integration
@@ -122,7 +122,7 @@ Then navigate to http://localhost:5000 (Flask).
 
 ---
 
-##🤝 Collaborators
+## 🤝 Collaborators
 - Subhav Jain
 - Sidhant Budhiraja
 - Komal Meena
@@ -130,7 +130,7 @@ Then navigate to http://localhost:5000 (Flask).
 
 ---
 
-##📚 Acknowledgments
+## 📚 Acknowledgments
 - OpenAI for powerful AI APIs
 - UNSPSC.org for the classification taxonomy
 - Sentence-Transformers for semantic search
