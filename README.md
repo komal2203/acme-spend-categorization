@@ -70,9 +70,9 @@ This system processes invoice-level data to categorize spend items according to 
    - **`data/manual_review.csv`**: Items requiring human validation  
    - **`logs/pipeline.log`**: Detailed logging of categorization events  
 
--->
----
 
+---
+-->
 
 ## 📁 Data Format
 
