@@ -94,7 +94,7 @@ Prepare your invoice CSV like this:
      python app.py
      ````
    - Then navigate to http://localhost:5000 (Flask).
-   
+   <!--
    - Main Dashboard![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
    - After Running the model![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
    - Categorised Table![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
@@ -104,7 +104,7 @@ Prepare your invoice CSV like this:
    - Confidence Distribution Pie Chart![Confidence Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/confidence_distribution_pie_chart.png)
    - Manual Review UI![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_ui.png)
    - Manual Review Dropdown![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dropdown.png)
-   
+   -->
 
 
 ---
