@@ -1,140 +1,139 @@
-# ACME Spend Categorization
+# 🧾 ACME Spend Categorization
 
-An intelligent invoice categorization system that automatically categorizes spend data using a combination of rule-based and AI-powered classification.
+An intelligent spend categorization system that automatically classifies invoice data using a hybrid of rule-based and AI-powered techniques, built for scalability, accuracy, and user-friendly oversight.
 
-## Overview
+---
 
-This system processes invoice data to automatically categorize spend items according to the UNSPSC (United Nations Standard Products and Services Code) taxonomy. It uses a hybrid approach combining:
-- Rule-based classification
-- AI-powered categorization using OpenAI's models
-- Manual review interface for low-confidence classifications
+## 🚀 Overview
 
-## Features
+This system processes invoice-level data to categorize spend items according to the [UNSPSC](https://www.unspsc.org/) (United Nations Standard Products and Services Code) taxonomy. It uses a hybrid pipeline that combines:
 
-- **Automated Categorization**: Process large volumes of invoice data automatically
-- **Hybrid Classification**: Combines rule-based and AI-powered approaches
-- **Confidence Scoring**: Each categorization comes with a confidence score
-- **Manual Review Interface**: Easy review and correction of low-confidence categorizations
-- **Data Visualization**: Interactive charts and analytics
-- **Export Capabilities**: Download categorized data in CSV format
+- 🧠 **AI-Powered Categorization** using OpenAI GPT models  
+- 🛠️ **Rule-Based Classification** for deterministic tagging  
+- 👀 **Manual Review Interface** for edge cases and quality assurance  
 
-## Prerequisites
+---
 
-- Python 3.9 or higher
-- OpenAI API key
-- Required Python packages (see requirements.txt)
+## ✨ Key Features
 
-## Installation
+- ✅ **Automatic Categorization**: Categorize thousands of line items at scale  
+- ⚖️ **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
+- 📈 **Confidence Scoring**: Track classification certainty with every result  
+- 🧑‍💼 **Manual Review**: Built-in UI for validating uncertain predictions  
+- 📊 **Data Visualization**: Interactive spend analytics (coming soon)  
+- 📤 **Export Capability**: Download categorized and reviewed data in CSV format  
+- 🧠 **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
+- 🔁 **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
 
-1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/acme-spend-categorization.git
-cd acme-spend-categorization
-```
+---
 
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+## ⚙️ Prerequisites
 
-3. Set up environment variables:
-Create a `.env` file in the root directory with:
+   - Python 3.9+
+   - [OpenAI API Key](https://platform.openai.com/account/api-keys)
+
+---
+
+<!--
+## 📦 Installation
 
 
-
-## Usage
-
-1. **Web Interface**:
-```bash
-python app.py
-```
-Access the web interface at `http://localhost:5000`
-
-2. **Upload Data**:
-- Prepare your invoice data in CSV format
-- Required columns: Description, Supplier, Amount, Invoice Id
-- Upload through the web interface
-
-3. **Process Data**:
-- The system will automatically:
-  - Apply rule-based classification
-  - Use AI for unclassified items
-  - Generate confidence scores
-  - Create manual review queue for low-confidence items
-
-4. **Review and Export**:
-- Review low-confidence categorizations
-- Make corrections if needed
-- Export final categorized data
-
-## Memory Management
-
-The system is optimized for memory efficiency:
-- Processes API Calls in Parallel
-- Implements garbage collection
-- Uses CPU-optimized versions of ML libraries
-- Monitors memory usage during processing
-
-## Deployment
-
-### Local Deployment
-1. Install dependencies
-2. Set up environment variables
-3. Run `python app.py`
-
-### Render Deployment
-1. Create a new Web Service on Render
-2. Connect your repository
-3. Set environment variables
-4. Deploy
-
-## Performance Considerations
-
-- **Memory Usage**: Monitor through logs/pipeline.log
-- **Processing Speed**: Varies based on data volume and complexity
-- **API Usage**: OpenAI API calls are optimized for cost efficiency
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/acme-spend-categorization.git
+   cd acme-spend-categorization
+   python3 -m venv venv
+   source venv/bin/activate  # macOS/Linux
+   # OR for Windows
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   python src/08_pipeline.py
+   ```
+   OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
 
+---
 
-## Support
+## 🧪 Usage
 
-For support, please:
-1. Check the documentation
-2. Review existing issues
-3. Create a new issue if needed
+1. **Run Full Pipeline** - Processes invoices and writes outputs
 
-## Acknowledgments
+   ```bash
+   python src/08_pipeline.py
+   ```
 
-- OpenAI for AI models
-- UNSPSC for taxonomy
+   ---
 
-##Collaborators 
-- Subhav Jain
-- Sidhant Budhiraja
-- Komal Meena
-- Prayash Pandey
+2. **Outputs**
 
-## Roadmap
+   - **data/categorized.csv**: High-confidence auto-tagged items  
+   - **`data/manual_review.csv`**: Items requiring human validation  
+   - **`logs/pipeline.log`**: Detailed logging of categorization events  
 
-- [ ] Enhanced rule engine
-- [ ] Additional visualization options
-- [ ] Batch processing improvements
-- [ ] API endpoint development
-- [ ] Mobile interface
 
-## Changelog
+---
+-->
 
-### Version 1.0.0
-- Initial release
-- Basic categorization functionality
-- Web interface
-- Manual review system
+## 📁 Data Format
+
+Prepare your invoice CSV like this:
+
+| invoice_id | sku   | description               | supplier       | amount |
+|------------|-------|---------------------------|----------------|--------|
+| INV-001    | 10001 | Black toner cartridge     | OfficeSupplyCo | 89.99  |
+| INV-002    | 20003 | Fiber optic cables, 50ft  | NetGear Inc.   | 129.50 |
+
+**Required columns**: `description`, `supplier`, `sku`, `invoice_id`
+
+---
+
+## 🌐 Web UI (Optional)
+   - To run a lightweight Flask interface:
+
+     ````bash
+     python app.py
+     ````
+   - Then navigate to http://localhost:5000 (Flask).
+
+---
+
+## 🧠 How It Works
+   - Sanitization: Cleans and normalizes invoice text
+   - Rule Matching: Applies analyst-defined keyword rules
+   - Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
+   - AI Selection: GPT-4 picks the most likely UNSPSC code
+   - Confidence Routing: Items below threshold are queued for manual review
+
+---
+
+## Performance & Monitoring
+   - Multi-core parallel processing via multiprocessing
+   - Confidence-based classification routing
+   - Logs available in logs/pipeline.log
+
+---
+
+
+## 📅 Roadmap
+   - More robust rule engine (regex, entity recognition)
+   - Spend analytics dashboard
+   - RESTful API endpoints for integration
+   - Scheduled batch job manager
+   - Mobile-friendly UI
+
+---
+
+## 🤝 Collaborators
+   - Subhav Jain
+   - Sidhant Budhiraja
+   - Komal Meena
+   - Prayash Pandey
+
+---
+
+## 📚 Acknowledgments
+   - OpenAI for powerful AI APIs
+   - UNSPSC.org for the classification taxonomy
+   - Sentence-Transformers for semantic search
+
 
