@@ -95,7 +95,7 @@ Prepare your invoice CSV like this:
      ````
    - Then navigate to http://localhost:5000 (Flask).
    
-   - Main Dashboard<br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
+   - Main Dashboard<br><br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
    - After Running the model![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
    - Categorised Table![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
    - Category Distribution Bar Graph![Category Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_distribution_bar_graph.png)
