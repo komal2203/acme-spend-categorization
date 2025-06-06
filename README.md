@@ -1,6 +1,6 @@
 # 🧾 ACME Spend Categorization
 
-An intelligent spend categorization system that automatically classifies invoice data using a hybrid of rule-based and AI-powered techniques, built for scalability, accuracy, and user-friendly oversight.
+An advanced, intelligent spend categorization system designed to automatically classify invoice-level procurement data using a hybrid approach that combines both rule-based logic and AI-driven semantic understanding. The system is architected to be scalable, accurate, and human-in-the-loop friendly, enabling organizations to process large volumes of invoice descriptions while maintaining control, auditability, and transparency over categorization decisions.
 
 ---
 
@@ -8,22 +8,22 @@ An intelligent spend categorization system that automatically classifies invoice
 
 This system processes invoice-level data to categorize spend items according to the [UNSPSC](https://www.unspsc.org/) (United Nations Standard Products and Services Code) taxonomy. It uses a hybrid pipeline that combines:
 
-- 🧠 **AI-Powered Categorization** using OpenAI GPT models  
-- 🛠️ **Rule-Based Classification** for deterministic tagging  
-- 👀 **Manual Review Interface** for edge cases and quality assurance  
+- **AI-Powered Categorization** using OpenAI GPT models  
+- **Rule-Based Classification** for deterministic tagging  
+- **Manual Review Interface** for edge cases and quality assurance  
 
 ---
 
 ## ✨ Key Features
 
-- ✅ **Automatic Categorization**: Categorize thousands of line items at scale  
-- ⚖️ **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
-- 📈 **Confidence Scoring**: Track classification certainty with every result  
-- 🧑‍💼 **Manual Review**: Built-in UI for validating uncertain predictions.  
-- 📊 **Data Visualization**: Interactive spend analytics and can be downloaded as well for detailed analysis. 
-- 📤 **Export Capability**: Download categorized and reviewed data in CSV format  
-- 🧠 **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
-- 🔁 **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
+- **Automatic Categorization**: Categorize thousands of line items at scale  
+- **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
+- **Confidence Scoring**: Track classification certainty with every result  
+- **Manual Review**: Built-in UI for validating uncertain predictions.  
+- **Data Visualization**: Interactive spend analytics and can be downloaded as well for detailed analysis. 
+- **Export Capability**: Download categorized and reviewed data in CSV format  
+- **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
+- **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
 
 ---
 
@@ -54,7 +54,7 @@ This system processes invoice-level data to categorize spend items according to 
 
 ---
 
-## 🧪 Usage
+## 🖥️ Usage
 
 1. **Run Full Pipeline** - Processes invoices and writes outputs
 
@@ -78,10 +78,10 @@ This system processes invoice-level data to categorize spend items according to 
 
 Prepare your invoice CSV like this:
 
-| invoice_id | sku   | description               | supplier       | amount |
+| Invoice ID | SKU   | Description               | Supplier       | Amount |
 |------------|-------|---------------------------|----------------|--------|
-| INV-001    | 10001 | Black toner cartridge     | OfficeSupplyCo | 89.99  |
-| INV-002    | 20003 | Fiber optic cables, 50ft  | NetGear Inc.   | 129.50 |
+|     001    | 10001 | Black toner cartridge     | OfficeSupplyCo | 89.99  |
+|     002    | 20003 | Fiber optic cables, 50ft  | NetGear Inc.   | 129.50 |
 
 **Required columns**: `description`, `supplier`, `sku`, `invoice_id`
 
@@ -109,16 +109,16 @@ Prepare your invoice CSV like this:
 
 ---
 
-## 🧠 How It Works
-   - Sanitization: Cleans and normalizes invoice text
-   - Rule Matching: Applies analyst-defined keyword rules
-   - Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
-   - AI Selection: GPT-4 picks the most likely UNSPSC code
-   - Confidence Routing: Items below threshold are queued for manual review
+## 💻 How It Works
+   - **Sanitization**: Cleans and normalizes invoice text
+   - **Rule Matching**: Applies analyst-defined keyword rules
+   - **Semantic Retrieval**: Finds top UNSPSC candidates via embedding similarity
+   - **AI Selection**: GPT-4 picks the most likely UNSPSC code
+   - **Confidence Routing**: Items below threshold are queued for manual review
 
 ---
 
-## Performance & Monitoring
+## 📊 Performance & Monitoring
    - Multi-core parallel processing via multiprocessing
    - Confidence-based classification routing
    - Logs available in logs/pipeline.log
