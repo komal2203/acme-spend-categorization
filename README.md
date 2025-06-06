@@ -19,8 +19,8 @@ This system processes invoice-level data to categorize spend items according to 
 - ✅ **Automatic Categorization**: Categorize thousands of line items at scale  
 - ⚖️ **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
 - 📈 **Confidence Scoring**: Track classification certainty with every result  
-- 🧑‍💼 **Manual Review**: Built-in UI for validating uncertain predictions  
-- 📊 **Data Visualization**: Interactive spend analytics (coming soon)  
+- 🧑‍💼 **Manual Review**: Built-in UI for validating uncertain predictions.  
+- 📊 **Data Visualization**: Interactive spend analytics and can be downloaded as well for detailed analysis. 
 - 📤 **Export Capability**: Download categorized and reviewed data in CSV format  
 - 🧠 **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
 - 🔁 **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
@@ -95,7 +95,7 @@ Prepare your invoice CSV like this:
      ````
    - Then navigate to http://localhost:5000 (Flask).
    
-   - Main Dashboard![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
+   - Main Dashboard<br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
    - After Running the model![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
    - Categorised Table![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
    - Category Distribution Bar Graph![Category Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_distribution_bar_graph.png)
