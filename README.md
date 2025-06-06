@@ -95,15 +95,15 @@ Prepare your invoice CSV like this:
      ````
    - Then navigate to http://localhost:5000 (Flask).
    
-   - Main Dashboard<br><br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
-   - After Running the model![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
-   - Categorised Table![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
-   - Category Distribution Bar Graph![Category Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_distribution_bar_graph.png)
-   - Supplier By Amount Distribution Bar Graph![ Supplier By Amount Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_amount_distribution.png)
-   - Supplier Distribution Pie Chart![Supplier Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_distribution_pie_chart.png)
-   - Confidence Distribution Pie Chart![Confidence Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/confidence_distribution_pie_chart.png)
-   - Manual Review UI![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_ui.png)
-   - Manual Review Dropdown![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dropdown.png)
+   - **Main Dashboard**<br><br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
+   - **After Running the Model**<br><br>![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
+   - **Categorised Table**<br><br>![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
+   - **Category Distribution Bar Graph**<br><br>![Category Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_distribution_bar_graph.png)
+   - **Supplier By Amount Distribution Bar Graph**<br><br>![ Supplier By Amount Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_amount_distribution.png)
+   - **Supplier Distribution Pie Chart**<br><br>![Supplier Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_distribution_pie_chart.png)
+   - **Confidence Distribution Pie Chart**<br><br>![Confidence Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/confidence_distribution_pie_chart.png)
+   - **Manual Review UI**<br><br>![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_ui.png)
+   - **Manual Review Dropdown**<br><br>![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dropdown.png)
 
 
 
@@ -131,14 +131,14 @@ Prepare your invoice CSV like this:
    - Spend analytics dashboard
    - RESTful API endpoints for integration
    - Scheduled batch job manager
-   - Mobile-friendly UI
+   - User-friendly UI
 
 ---
 
 ## 🤝 Collaborators
+   - Komal Meena
    - Subhav Jain
    - Sidhant Budhiraja
-   - Komal Meena
    - Prayash Pandey
 
 ---
