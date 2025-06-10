@@ -5,79 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Manual Review</title>
     <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
       rel="stylesheet"
-      href="{{ url_for('static', filename='style.css') }}"
     />
+    <style>
+      .search-container {
+        margin: 20px 0;
+      }
+      .search-input {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .dropdown-container {
+        position: relative;
+      }
+      .dropdown-list {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: none;
+        position: absolute;
+        width: 100%;
+        background: white;
+        z-index: 1000;
+      }
+      .dropdown-list.show {
+        display: block;
+      }
+      .dropdown-item {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+      .dropdown-item:hover {
+        background-color: #f0f0f0;
+      }
+      .selected-item {
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        background-color: #f8f9fa;
+      }
+    </style>
   </head>
   <body>
-   
-    <div class="container">
-      <h1>Invoice Categorization – Manual Review</h1>
+    <div class="container mt-4">
+      <h1>Manual Review</h1>
+      
       {% if error %}
-      <div class="error-message">{{ error }}</div>
+      <div class="alert alert-danger">{{ error }}</div>
       {% endif %}
-      {% if not data %}
-      <!-- <p>No records available for manual review.</p> -->
-      {% else %}
-      <table class="result-table">
-        <thead>
-          <tr>
-            <th>Invoice ID</th>
-            <th>Description</th>
-            <th>Current Code</th>
-            <th>Correct Code</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for row in data %}
-          <tr>
-            <form method="POST">
-              <td>{{ row.invoice_id }}</td>
-              <td>{{ row.description }}</td>
-              <td>{{ row.commodity_code }}</td>
-              <td>
-                <select name="corrected_code">
+
+      {% if success %}
+      <div class="alert alert-success">
+        Classification updated successfully!
+        <a href="{{ download_link }}" class="btn btn-primary">Download Updated Results</a>
+      </div>
+      {% endif %}
+
+      {% if data %}
+      <form method="post">
+        {% for item in data %}
+        <div class="card mb-3">
+          <div class="card-body">
+            <h5 class="card-title">Invoice ID: {{ item.invoice_id }}</h5>
+            <p class="card-text">
+              <strong>Supplier:</strong> {{ item.supplier }}<br>
+              <strong>Description:</strong> {{ item.description }}<br>
+              <strong>Current Code:</strong> {{ item.commodity_code }}
+            </p>
+            
+            <div class="search-container">
+              <input type="text" 
+                     class="search-input" 
+                     placeholder="Search UNSPSC codes..."
+                     data-dropdown="dropdown-{{ item.invoice_id }}"
+                     onkeyup="filterDropdown(this)">
+              
+              <div class="dropdown-container">
+                <div class="selected-item" id="selected-{{ item.invoice_id }}">
+                  Selected: {{ item.commodity_code }}
+                </div>
+                
+                <div class="dropdown-list" id="dropdown-{{ item.invoice_id }}">
                   {% for code, title in unspsc_dropdown_map.items() %}
-                    {% if title %}
-                      <option value="{{ code }}">{{ code }} – {{ title }}</option>
-                    {% endif %}
+                  <div class="dropdown-item" 
+                       data-code="{{ code }}"
+                       data-title="{{ title }}"
+                       onclick="selectItem(this, '{{ item.invoice_id }}')">
+                    {{ code }} - {{ title }}
+                  </div>
                   {% endfor %}
-                </select>
-              </td>
-              <td>
-                <input
-                  type="hidden"
-                  name="invoice_id"
-                  value="{{ row.invoice_id }}"
-                />
-                <button type="submit" class="save-btn">Save</button>
-              </td>
-            </form>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+                </div>
+              </div>
+              
+              <input type="hidden" 
+                     name="corrected_code" 
+                     id="corrected-code-{{ item.invoice_id }}"
+                     value="{{ item.commodity_code }}">
+            </div>
+            
+            <input type="hidden" name="invoice_id" value="{{ item.invoice_id }}">
+            <button type="submit" class="btn btn-primary">Save Correction</button>
+          </div>
+        </div>
+        {% endfor %}
+      </form>
+      {% else %}
+      <div class="alert alert-info">No items to review.</div>
       {% endif %}
-      {% if download_link %}
-      <div class="manual-review-download-container">
-        <a href="{{ download_link }}" class="manual-review-download-btn"
-          >Download Updated Categorized CSV</a
-        >
-      </div>
-      {% endif %}
-      <div id="loading-indicator" class="manual-review-loading-message">
-        Loading data...
-      </div>
+      
+      <a href="/" class="btn btn-secondary">Back to Home</a>
     </div>
 
     <script>
-      window.addEventListener("load", function () {
-        // Hide the loading indicator
-        document.getElementById("loading-indicator").style.display = "none";
+      // Function to filter dropdown items
+      function filterDropdown(input) {
+        const dropdownId = input.getAttribute('data-dropdown');
+        const dropdown = document.getElementById(dropdownId);
+        const filter = input.value.toLowerCase();
+        const items = dropdown.getElementsByClassName('dropdown-item');
+        
+        // Show dropdown when typing
+        dropdown.classList.add('show');
+        
+        // Filter items
+        for (let item of items) {
+          const text = item.textContent.toLowerCase();
+          if (text.includes(filter)) {
+            item.style.display = '';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+      }
 
-        // Show the main container
-        document.querySelector(".container").style.display = "block";
+      // Function to select an item
+      function selectItem(item, invoiceId) {
+        const code = item.getAttribute('data-code');
+        const title = item.getAttribute('data-title');
+        const selectedDiv = document.getElementById(`selected-${invoiceId}`);
+        const hiddenInput = document.getElementById(`corrected-code-${invoiceId}`);
+        
+        // Update selected item display
+        selectedDiv.textContent = `Selected: ${code} - ${title}`;
+        
+        // Update hidden input
+        hiddenInput.value = code;
+        
+        // Hide dropdown
+        const dropdown = document.getElementById(`dropdown-${invoiceId}`);
+        dropdown.classList.remove('show');
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', function(event) {
+        const dropdowns = document.getElementsByClassName('dropdown-list');
+        for (let dropdown of dropdowns) {
+          if (!dropdown.contains(event.target) && 
+              !event.target.classList.contains('search-input')) {
+            dropdown.classList.remove('show');
+          }
+        }
+      });
+
+      // Show dropdown when clicking search input
+      document.querySelectorAll('.search-input').forEach(input => {
+        input.addEventListener('click', function() {
+          const dropdownId = this.getAttribute('data-dropdown');
+          const dropdown = document.getElementById(dropdownId);
+          dropdown.classList.add('show');
+        });
       });
     </script>
   </body>

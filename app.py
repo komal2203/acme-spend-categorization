@@ -53,7 +53,6 @@ def manual_review():
                 error="No invoices to review!"
             )
     except pd.errors.EmptyDataError:
-        # Handle completely empty files (no rows and no columns)
         return render_template(
             "manual_review.html",
             data=[],
