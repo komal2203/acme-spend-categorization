@@ -99,6 +99,29 @@ def manual_review():
 # def download_categorized():
 #     return send_from_directory(directory="data", path="categorized.csv", as_attachment=True)
 
+@app.route("/download_updated_csv")
+def download_updated_csv():
+    try:
+        # Read both files
+        manual_df = pd.read_csv("data/manual_review.csv")
+        categorized_df = pd.read_csv("data/categorized.csv")
+        
+        # Combine the dataframes
+        combined_df = pd.concat([manual_df, categorized_df], ignore_index=True)
+        
+        # Create a temporary file
+        temp_file = "data/updated_classifications.csv"
+        combined_df.to_csv(temp_file, index=False)
+        
+        return send_file(
+            temp_file,
+            mimetype='text/csv',
+            as_attachment=True,
+            download_name='updated_classifications.csv'
+        )
+    except Exception as e:
+        return str(e), 500
+    
 @app.route("/download_categorized")
 def download_categorized():
     df = pd.read_csv("data/categorized.csv")
