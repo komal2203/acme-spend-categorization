@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Spend Categorization Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        .chart-loading {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Spend Categorization Dashboard</a>
+            <a class="btn btn-light" href="/">Home</a>
+        </div>
+    </nav>
+    <div class="container">
+        <h2 class="mb-4">Feedback & Model Improvement Overview</h2>
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Total Classifications</h5>
+                        <p class="card-text display-6">{{ stats.total_classifications }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Success Rate</h5>
+                        <p class="card-text display-6">{{ stats.success_rate|round(2) }}%</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Avg. Confidence</h5>
+                        <p class="card-text display-6">{{ stats.avg_confidence|round(3) }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Active Suppliers</h5>
+                        <p class="card-text display-6">{{ stats.active_suppliers }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        Success Rate Over Time
+                    </div>
+                    <div class="card-body">
+                        <div id="successChartLoading" class="chart-loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <canvas id="successChart" height="100" style="display: none;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        Top Suppliers (by # Classifications)
+                    </div>
+                    <div class="card-body">
+                        <div id="supplierChartLoading" class="chart-loading">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <canvas id="supplierChart" height="250" style="display: none;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-5">
+            <div class="card-header bg-primary text-white">
+                Supplier Performance Table
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-striped table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Supplier</th>
+                            <th>Total Classifications</th>
+                            <th>Success Rate (%)</th>
+                            <th>Avg. Confidence</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supplier in supplier_stats %}
+                        <tr>
+                            <td>{{ supplier.name }}</td>
+                            <td>{{ supplier.total_classifications }}</td>
+                            <td>{{ supplier.success_rate|round(2) }}</td>
+                            <td>{{ supplier.avg_confidence|round(3) }}</td>
+                            <td>{{ supplier.last_updated }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Chart.js scripts -->
+    <script>
+        function createCharts() {
+            if ({{ chart_data.dates | length }} > 0) {
+                createSuccessChart();
+                createSupplierChart();
+            } else {
+                document.getElementById('successChartLoading').parentElement.innerHTML = '<p class="text-center">No data available</p>';
+                document.getElementById('supplierChartLoading').parentElement.innerHTML = '<p class="text-center">No data available</p>';
+            }
+        }
+
+        function createSuccessChart() {
+            const successCtx = document.getElementById('successChart').getContext('2d');
+            new Chart(successCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_data.dates | safe }},
+                    datasets: [{
+                        label: 'Success Rate (%)',
+                        data: {{ chart_data.success_rates | safe }},
+                        borderColor: 'green',
+                        backgroundColor: 'rgba(0,128,0,0.1)',
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true, max: 100 }
+                    }
+                }
+            });
+            document.getElementById('successChartLoading').style.display = 'none';
+            document.getElementById('successChart').style.display = 'block';
+        }
+
+        function createSupplierChart() {
+            const supplierCtx = document.getElementById('supplierChart').getContext('2d');
+            new Chart(supplierCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ chart_data.top_suppliers | safe }},
+                    datasets: [{
+                        label: 'Classifications',
+                        data: {{ chart_data.top_supplier_counts | safe }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    indexAxis: 'y'
+                }
+            });
+            document.getElementById('supplierChartLoading').style.display = 'none';
+            document.getElementById('supplierChart').style.display = 'block';
+        }
+
+        // Call createCharts when the page loads
+        window.addEventListener('load', createCharts);
+    </script>
+</body>
+</html>
