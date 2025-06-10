@@ -1,6 +1,6 @@
 # 🧾 ACME Spend Categorization
 
-An intelligent spend categorization system that automatically classifies invoice data using a hybrid of rule-based and AI-powered techniques, built for scalability, accuracy, and user-friendly oversight.
+An advanced, intelligent spend categorization system designed to automatically classify invoice-level procurement data using a hybrid approach that combines both rule-based logic and AI-driven semantic understanding. The system is architected to be scalable, accurate, and human-in-the-loop friendly, enabling organizations to process large volumes of invoice descriptions while maintaining control, auditability, and transparency over categorization decisions.
 
 ---
 
@@ -8,22 +8,22 @@ An intelligent spend categorization system that automatically classifies invoice
 
 This system processes invoice-level data to categorize spend items according to the [UNSPSC](https://www.unspsc.org/) (United Nations Standard Products and Services Code) taxonomy. It uses a hybrid pipeline that combines:
 
-- 🧠 **AI-Powered Categorization** using OpenAI GPT models  
-- 🛠️ **Rule-Based Classification** for deterministic tagging  
-- 👀 **Manual Review Interface** for edge cases and quality assurance  
+- **AI-Powered Categorization** using OpenAI GPT models  
+- **Rule-Based Classification** for deterministic tagging  
+- **Manual Review Interface** for edge cases and quality assurance  
 
 ---
 
 ## ✨ Key Features
 
-- ✅ **Automatic Categorization**: Categorize thousands of line items at scale  
-- ⚖️ **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
-- 📈 **Confidence Scoring**: Track classification certainty with every result  
-- 🧑‍💼 **Manual Review**: Built-in UI for validating uncertain predictions  
-- 📊 **Data Visualization**: Interactive spend analytics (coming soon)  
-- 📤 **Export Capability**: Download categorized and reviewed data in CSV format  
-- 🧠 **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
-- 🔁 **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
+- **Automatic Categorization**: Categorize thousands of line items at scale  
+- **Hybrid Classification**: Leverages both deterministic rules and probabilistic AI  
+- **Confidence Scoring**: Track classification certainty with every result  
+- **Manual Review**: Built-in UI for validating uncertain predictions.  
+- **Data Visualization**: Interactive spend analytics and can be downloaded as well for detailed analysis. 
+- **Export Capability**: Download categorized and reviewed data in CSV format  
+- **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
+- **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
 
 ---
 
@@ -34,7 +34,7 @@ This system processes invoice-level data to categorize spend items according to 
 
 ---
 
-<!--
+
 ## 📦 Installation
 
 
@@ -54,7 +54,7 @@ This system processes invoice-level data to categorize spend items according to 
 
 ---
 
-## 🧪 Usage
+## 🖥️ Usage
 
 1. **Run Full Pipeline** - Processes invoices and writes outputs
 
@@ -72,16 +72,16 @@ This system processes invoice-level data to categorize spend items according to 
 
 
 ---
--->
+
 
 ## 📁 Data Format
 
 Prepare your invoice CSV like this:
 
-| invoice_id | sku   | description               | supplier       | amount |
+| Invoice ID | SKU   | Description               | Supplier       | Amount |
 |------------|-------|---------------------------|----------------|--------|
-| INV-001    | 10001 | Black toner cartridge     | OfficeSupplyCo | 89.99  |
-| INV-002    | 20003 | Fiber optic cables, 50ft  | NetGear Inc.   | 129.50 |
+|     001    | 10001 | Black toner cartridge     | OfficeSupplyCo | 89.99  |
+|     002    | 20003 | Fiber optic cables, 50ft  | NetGear Inc.   | 129.50 |
 
 **Required columns**: `description`, `supplier`, `sku`, `invoice_id`
 
@@ -94,19 +94,31 @@ Prepare your invoice CSV like this:
      python app.py
      ````
    - Then navigate to http://localhost:5000 (Flask).
+   
+   - **Main Dashboard**<br><br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
+   - **After Running the Model**<br><br>![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
+   - **Categorised Table**<br><br>![Categorised table](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/categorised_table.png)
+   - **Category Distribution Bar Graph**<br><br>![Category Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_distribution_bar_graph.png)
+   - **Supplier By Amount Distribution Bar Graph**<br><br>![ Supplier By Amount Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_amount_distribution.png)
+   - **Supplier Distribution Pie Chart**<br><br>![Supplier Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_distribution_pie_chart.png)
+   - **Confidence Distribution Pie Chart**<br><br>![Confidence Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/confidence_distribution_pie_chart.png)
+   - **Manual Review UI**<br><br>![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_ui.png)
+   - **Manual Review Dropdown**<br><br>![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dropdown.png)
+
+
 
 ---
 
-## 🧠 How It Works
-   - Sanitization: Cleans and normalizes invoice text
-   - Rule Matching: Applies analyst-defined keyword rules
-   - Semantic Retrieval: Finds top UNSPSC candidates via embedding similarity
-   - AI Selection: GPT-4 picks the most likely UNSPSC code
-   - Confidence Routing: Items below threshold are queued for manual review
+## 💻 How It Works
+   - **Sanitization**: Cleans and normalizes invoice text
+   - **Rule Matching**: Applies analyst-defined keyword rules
+   - **Semantic Retrieval**: Finds top UNSPSC candidates via embedding similarity
+   - **AI Selection**: GPT-4 picks the most likely UNSPSC code
+   - **Confidence Routing**: Items below threshold are queued for manual review
 
 ---
 
-## Performance & Monitoring
+## 📊 Performance & Monitoring
    - Multi-core parallel processing via multiprocessing
    - Confidence-based classification routing
    - Logs available in logs/pipeline.log
@@ -119,14 +131,14 @@ Prepare your invoice CSV like this:
    - Spend analytics dashboard
    - RESTful API endpoints for integration
    - Scheduled batch job manager
-   - Mobile-friendly UI
+   - User-friendly UI
 
 ---
 
 ## 🤝 Collaborators
+   - Komal Meena
    - Subhav Jain
    - Sidhant Budhiraja
-   - Komal Meena
    - Prayash Pandey
 
 ---
