@@ -68,6 +68,8 @@ def manual_review():
         # Find the row to save
         row_to_save = df[df["invoice_id"] == invoice_id].copy()
         row_to_save["commodity_code"] = corrected_code
+        # Add the commodity title from the dropdown map
+        row_to_save["commodity_title"] = unspsc_dropdown_map.get(corrected_code, "")
         row_to_save["confidence"] = 1.0
 
         # Append the row to categorized.csv
@@ -125,6 +127,11 @@ def download_updated_csv():
 @app.route("/download_categorized")
 def download_categorized():
     df = pd.read_csv("data/categorized.csv")
+    
+    # Ensure commodity_title exists and is correct
+    if 'commodity_title' not in df.columns:
+        df['commodity_title'] = df['commodity_code'].map(unspsc_dropdown_map)
+
     df.columns = [prettify_column(c) for c in df.columns]
     # Remove the Confidence Rounded column if it exists
     if 'Confidence Rounded' in df.columns:
