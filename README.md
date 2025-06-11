@@ -23,8 +23,42 @@ This system processes invoice-level data to categorize spend items according to 
 - **Data Visualization**: Interactive spend analytics and can be downloaded as well for detailed analysis. 
 - **Export Capability**: Download categorized and reviewed data in CSV format  
 - **Taxonomy-Aware Embeddings**: Uses semantic similarity against the UNSPSC hierarchy  
-- **Daily Taxonomy Sync**: Refreshes UNSPSC data every 24 hours automatically  
+- **Daily Taxonomy Sync**: Refreshes UNSPSC data every 3 months automatically
+- **Real-time Search**: Instant search across categorized items
+- **Learning System**: Use feedback to improve future classifications
+- **Feedback History**: Maintain audit trail of all corrections
+- **Continuous Improvement**: Regular prompt updates based on feedback
 
+---
+
+### 📊 Enhanced Performance Metrics
+- **Detailed Analytics Dashboard**:
+  - Confidence distribution analysis
+  - Category-wise performance metrics
+  - Source distribution (Rule-based vs AI-based)
+- **Downloadable Reports**:
+  - Export metrics as CSV
+
+---
+
+### 🎯 Prompt Optimization
+- **Dynamic Prompt Engineering**: Automatically optimize prompts based on performance
+- **Context-Aware Prompts**: Adapt prompts based on item category
+- **Continuous Improvement**: Regular prompt updates based on feedback
+
+---
+
+### 📈 Performance Visualization
+- **Interactive Charts**:
+  - Category distribution bar graphs
+  - Supplier amount distribution
+  - Confidence score pie charts
+  - Source distribution analysis
+- **Downloadable Visualizations**:
+  - Export charts as PNG
+  - Save metrics as CSV
+  - Generate comprehensive reports
+ 
 ---
 
 ## ⚙️ Prerequisites
