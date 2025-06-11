@@ -5,6 +5,7 @@ __pycache__/
 # Virtual environments
 venv/
 .env
+venv_new/
 
 # Data outputs and intermediate files
 data/categorized.csv
