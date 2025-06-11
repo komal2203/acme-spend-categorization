@@ -136,8 +136,10 @@ Prepare your invoice CSV like this:
    - **Supplier By Amount Distribution Bar Graph**<br><br>![ Supplier By Amount Distribution Bar Graph](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_amount_distribution.png)
    - **Supplier Distribution Pie Chart**<br><br>![Supplier Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/supplier_distribution_pie_chart.png)
    - **Confidence Distribution Pie Chart**<br><br>![Confidence Distribution Pie Chart](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/confidence_distribution_pie_chart.png)
-   - **Manual Review UI**<br><br>![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_ui.png)
-   - **Manual Review Dropdown**<br><br>![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dropdown.png)
+   - **Manual Review UI**<br><br>![Manual Review UI](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_dashboard.png)
+   - **Manual Review Dropdown and Seachbar**<br><br>![Manual Review Dropdown](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/manual_review_searchbar.png)
+   - **Model Performance Metrics**<br><br>![Model Performance Metrics](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/model_performance_metrics.png)
+   - **Category Wise Performance**<br><br>![Category Wise Performance](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/category_wise_performance.png)
 
 
 
