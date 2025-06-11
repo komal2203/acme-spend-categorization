@@ -1,41 +1,6 @@
 Invoice ID,Supplier,SKU,Managing Account,Amount,Description
-1,Acme Supplies,Wheat seeds,Account1,$850,Vegetable seeds
-2,Global Industries,Barley seeds,Account2,$920,Cereal seeds
-3,GreenFields Co,Ammonium nitrate fertilizer,Account3,"$1,200",Fertilizer
-4,BuildRight Inc,Steel beam,Account4,"$4,500",Construction materials
-5,ToolMasters,Electric drill,Account5,$350,Power tool
-6,MedTech Solutions,Latex gloves,Account1,$180,Medical gloves
-7,LabWorks LLC,Surgical mask,Account2,$75,Protective mask
-8,CleanWell Ltd,Broom,Account3,$45,Floor cleaning tool
-9,FreshFoods Ltd,Disposable plates,Account4,$120,Foodservice disposables
-10,TechGear,Desktop computer,Account5,"$2,200",Office computer
-11,NetConnect,Router,Account1,$300,Network router
-12,PrintPro,Printer ink,Account2,$230,Ink cartridge
-13,OfficeEssentials,Printer paper,Account3,$110,Copy paper
-14,SecureSafe,Fire alarm system,Account4,"$1,750",Fire safety equipment
-15,WatchGuard,CCTV camera,Account5,$550,Surveillance camera
-16,HomeComforts,Refrigerator,Account1,"$1,300",Kitchen appliance
-17,KitchenPro,Cookware set,Account2,$400,Kitchenware
-18,AutoParts Co,Hydraulic jack,Account3,$640,Garage equipment
-19,MaintMasters,HVAC servicing,Account5,"$1,100",Maintenance service
-20,FreshFoods Ltd,Live chickens,Account1,$320,Live poultry
-21,AgriSource,Live salmon,Account2,$450,Live fish
-22,PestControl Inc,Silkworms,Account3,$210,Live insects
-23,PetWorld,Cats,Account4,$150,Live animals (cats)
-24,GreenFields Co,Bean seeds,Account1,$95,Legume seeds
-25,GreenFields Co,Carrot seeds,Account2,$85,Vegetable seeds
-26,OfficeEssentials,Office chair,Account3,$780,Furniture
-27,FurnitureHub,Desk lamp,Account4,$145,Lighting fixture
-28,CleanWell Ltd,Dishwasher,Account5,$900,Kitchen cleaning machine
-29,MedTech Solutions,Test tubes,Account1,$60,Lab glassware
-30,LabWorks LLC,Beakers,Account2,$55,Lab container
-31,SecureSafe,Bicycle helmet,Account3,$70,Safety gear
-32,HealthFirst,First aid kit,Account4,$130,Medical kit
-33,ServicePlus,Software license,Account5,"$2,000",Software subscription
-34,PrintPro,Laser printer,Account1,"$1,100",Printing hardware
-35,NetConnect,Network switch,Account2,$420,Switching equipment
-36,ToolMasters,Hand saw,Account5,$120,Hand tool
 37,NatureSeeds,Zucchini seeds,Account5,$830,Vegetable seeds
 38,AgriSource,Delta-100,Account1,$1250,High-precision industrial widget for general use
 39,TransEquip Inc,XJ Pack,Account2,$2400,Multi-purpose equipment bundle with unclear specifications
-40,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
+47,FarmGrow Ltd,ServiceX Pro,Account5,$2300,Comprehensive service package including installation and maintenance
+5,Global Industries,Barley seeds,Account2,$920,Cereal seeds
