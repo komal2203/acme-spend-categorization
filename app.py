@@ -7,6 +7,7 @@ import sys
 import time
 from src.taxonomy_service import unspsc_map
 from src.taxonomy_service import unspsc_dropdown_map
+from src.evaluation_metrics import generate_evaluation_report
 
 def prettify_column(col):
     # Remove underscores, capitalize each word, join with space
@@ -162,10 +163,11 @@ def index():
     chart_data = []
     pie_chart_data = []
     confidence_pie_data = [] 
-    amount_chart_data = []  # For amount by supplier
+    amount_chart_data = []
     error = None
     elapsed = None
-    uploaded_filename = None  # Track the uploaded file name
+    uploaded_filename = None
+    evaluation_report = {}
 
     if request.method == "POST":
         invoice_file = request.files.get("invoice_file")
@@ -181,7 +183,8 @@ def index():
                 result_table=result_table,
                 confidence_pie_data=confidence_pie_data,
                 amount_chart_data=amount_chart_data,
-                uploaded_filename=uploaded_filename
+                uploaded_filename=uploaded_filename,
+                evaluation_report=evaluation_report
             )
 
         uploaded_filename = secure_filename(invoice_file.filename)
@@ -217,121 +220,117 @@ def index():
                 result_table=result_table,
                 amount_chart_data=amount_chart_data,
                 confidence_pie_data=confidence_pie_data,
-                uploaded_filename=uploaded_filename
+                uploaded_filename=uploaded_filename,
+                evaluation_report=evaluation_report
             )
 
-        result_df = pd.read_csv("data/categorized.csv")
-        # Don't modify the source and confidence columns at all
-        confidence_col = 'confidence'  # Use exact column name
-        source_col = 'source'  # Use exact column name
-
-        if confidence_col in result_df.columns and not result_df.empty:
-            # Create a temporary column for pie chart data only
-            temp_df = result_df.copy()
-            temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
+        try:
+            # Read the categorized data
+            df = pd.read_csv("data/categorized.csv")
             
-            # Group by both confidence and source using exact column names
-            confidence_counts = temp_df.groupby(['Confidence Rounded', source_col]).size().reset_index(name='count')
+            # Generate evaluation metrics
+            evaluation_report = generate_evaluation_report(df)
             
-            # Create the final data structure
-            confidence_pie_data = []
-            for _, row in confidence_counts.iterrows():
-                confidence_pie_data.append({
-                    'category': row['Confidence Rounded'],
-                    'count': row['count'],
-                    'source': row[source_col]  # This will be exactly 'Rule' or 'GenAI'
-                })
-        else:
-            confidence_pie_data = []
-
-        # Now prettify other columns for display
-        result_df.columns = [prettify_column(c) for c in result_df.columns]
-        
-        # Remove the Confidence Rounded column if it exists
-        if 'Confidence Rounded' in result_df.columns:
-            result_df = result_df.drop(columns=['Confidence Rounded'])
-
-        # Explicitly rename the two columns
-        result_df = result_df.rename(columns={
-            "Commodity Title": "UNSPSC\nCategory\nName",
-            "Commodity Code": "UNSPSC \nCategory ID\n"
-        })
-
-        commodity_col = "UNSPSC\nCategory\nName"
-        if commodity_col in result_df.columns and not result_df.empty:
-            result_df = result_df.dropna(subset=[commodity_col])
-            top_n = 10
-            vc_df = result_df[commodity_col].value_counts().nlargest(top_n).reset_index()
-            cat_col = vc_df.columns[0]
-            count_col = vc_df.columns[1]
-            chart_data = (
-                vc_df.rename(columns={cat_col: 'category', count_col: 'count'})
-                .to_dict(orient='records')
-            )
-        else:
-            chart_data = []
+            # Prepare confidence pie data
+            confidence_col = 'confidence'
+            source_col = 'source'
             
-        supplier_col = "Supplier"
-        if supplier_col in result_df.columns and not result_df.empty:
-            pie_vc_df = result_df[supplier_col].value_counts().nlargest(5).reset_index()
-            pie_sup_col = pie_vc_df.columns[0]
-            pie_count_col = pie_vc_df.columns[1]
-            pie_chart_data = (
-                pie_vc_df.rename(columns={pie_sup_col: 'category', pie_count_col: 'count'})
-                .to_dict(orient='records')
-            )
-        else:
-            pie_chart_data = []
+            if confidence_col in df.columns and not df.empty:
+                temp_df = df.copy()
+                temp_df['Confidence Rounded'] = temp_df[confidence_col].round(4)
+                confidence_counts = temp_df.groupby(['Confidence Rounded', source_col]).size().reset_index(name='count')
+                confidence_pie_data = []
+                for _, row in confidence_counts.iterrows():
+                    confidence_pie_data.append({
+                        'category': row['Confidence Rounded'],
+                        'count': row['count'],
+                        'source': row[source_col]
+                    })
             
-        amount_col = "Amount"
-        supplier_col = "Supplier"
-
-        if amount_col in result_df.columns and supplier_col in result_df.columns and not result_df.empty:
-            # Remove $ and commas, then convert to float
-            result_df[amount_col] = (
-                result_df[amount_col]
-                .astype(str)
-                .replace(r'[\$,]', '', regex=True)
-                .replace('', '0')
-                .astype(float)
+            # Now prettify other columns for display
+            result_df = df.copy()
+            result_df.columns = [prettify_column(c) for c in result_df.columns]
+            
+            # Remove the Confidence Rounded column if it exists
+            if 'Confidence Rounded' in result_df.columns:
+                result_df = result_df.drop(columns=['Confidence Rounded'])
+            
+            # Explicitly rename the two columns
+            result_df = result_df.rename(columns={
+                "Commodity Title": "UNSPSC\nCategory\nName",
+                "Commodity Code": "UNSPSC \nCategory ID\n"
+            })
+            
+            # Prepare chart data
+            commodity_col = "UNSPSC\nCategory\nName"
+            if commodity_col in result_df.columns and not result_df.empty:
+                result_df = result_df.dropna(subset=[commodity_col])
+                top_n = 10
+                vc_df = result_df[commodity_col].value_counts().nlargest(top_n).reset_index()
+                cat_col = vc_df.columns[0]
+                count_col = vc_df.columns[1]
+                chart_data = (
+                    vc_df.rename(columns={cat_col: 'category', count_col: 'count'})
+                    .to_dict(orient='records')
+                )
+            
+            # Prepare supplier pie chart data
+            supplier_col = "Supplier"
+            if supplier_col in result_df.columns and not result_df.empty:
+                pie_vc_df = result_df[supplier_col].value_counts().nlargest(5).reset_index()
+                pie_sup_col = pie_vc_df.columns[0]
+                pie_count_col = pie_vc_df.columns[1]
+                pie_chart_data = (
+                    pie_vc_df.rename(columns={pie_sup_col: 'category', pie_count_col: 'count'})
+                    .to_dict(orient='records')
+                )
+            
+            # Prepare amount chart data
+            amount_col = "Amount"
+            if amount_col in result_df.columns and supplier_col in result_df.columns and not result_df.empty:
+                result_df[amount_col] = (
+                    result_df[amount_col]
+                    .astype(str)
+                    .replace(r'[\$,]', '', regex=True)
+                    .replace('', '0')
+                    .astype(float)
+                )
+                amount_by_supplier = (
+                    result_df.groupby(supplier_col)[amount_col]
+                    .sum()
+                    .nlargest(10)
+                    .reset_index()
+                )
+                amount_chart_data = amount_by_supplier.rename(
+                    columns={supplier_col: "category", amount_col: "amount"}
+                ).to_dict(orient="records")
+            
+            # Remove unnecessary columns
+            cols_to_remove = [
+                'Segment Code', 'Segment Title',
+                'Family Code', 'Family Title',
+                'Class Code', 'Class Title'
+            ]
+            result_df = result_df.drop(columns=[c for c in cols_to_remove if c in result_df.columns])
+            
+            result_table = result_df.to_html(classes="result-table", index=False)
+            
+        except Exception as e:
+            print(f"Error processing results: {str(e)}")
+            error = f"Error processing results: {str(e)}"
+            return render_template(
+                "index.html",
+                error=error,
+                elapsed=elapsed,
+                chart_data=chart_data,
+                pie_chart_data=pie_chart_data,
+                result_table=result_table,
+                amount_chart_data=amount_chart_data,
+                confidence_pie_data=confidence_pie_data,
+                uploaded_filename=uploaded_filename,
+                evaluation_report=evaluation_report
             )
-            amount_by_supplier = (
-                result_df.groupby(supplier_col)[amount_col]
-                .sum()
-                .nlargest(10)
-                .reset_index()
-            )
-            amount_chart_data = amount_by_supplier.rename(
-                columns={supplier_col: "category", amount_col: "amount"}
-            ).to_dict(orient="records")
-        else:
-            amount_chart_data = []
 
-        cols_to_remove = [
-            'Segment Code', 'Segment Title',
-            'Family Code', 'Family Title',
-            'Class Code', 'Class Title'
-        ]
-        result_df = result_df.drop(columns=[c for c in cols_to_remove if c in result_df.columns])
-
-        # Remove the confidence rounded column from the final table
-        if 'Confidence Rounded' in result_df.columns:
-            result_df = result_df.drop(columns=['Confidence Rounded'])
-
-        result_table = result_df.to_html(classes="result-table", index=False)
-
-        return render_template(
-            "index.html",
-            result_table=result_table,
-            elapsed=elapsed,
-            chart_data=chart_data,
-            pie_chart_data=pie_chart_data,
-            confidence_pie_data=confidence_pie_data,
-            amount_chart_data=amount_chart_data,
-            uploaded_filename=uploaded_filename
-        )
-
-    # For GET requests, just render the page with no results
     return render_template(
         "index.html",
         result_table=result_table,
@@ -340,7 +339,8 @@ def index():
         pie_chart_data=pie_chart_data,
         confidence_pie_data=confidence_pie_data,
         amount_chart_data=amount_chart_data,
-        uploaded_filename=uploaded_filename
+        uploaded_filename=uploaded_filename,
+        evaluation_report=evaluation_report
     )
 
 @app.route("/download")

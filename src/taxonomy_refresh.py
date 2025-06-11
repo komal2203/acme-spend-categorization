@@ -11,7 +11,7 @@ def job():
     print(f"[{time.ctime()}] Refreshed UNSPSC: {len(df)} codes loaded.")
 
 # Schedule the job every 24 hours
-schedule.every(24).hours.do(job)
+schedule.every(90).days.do(job)
 
 if __name__ == '__main__':
     job()  # Run once at startup
