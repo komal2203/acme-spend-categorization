@@ -61,53 +61,6 @@ This system processes invoice-level data to categorize spend items according to 
  
 ---
 
-## ⚙️ Prerequisites
-
-   - Python 3.9+
-   - [OpenAI API Key](https://platform.openai.com/account/api-keys)
-
----
-
-
-## 📦 Installation
-
-
-1. **Clone the Repository**
-   ```bash
-   git clone https://github.com/yourusername/acme-spend-categorization.git
-   cd acme-spend-categorization
-   python3 -m venv venv
-   source venv/bin/activate  # macOS/Linux
-   # OR for Windows
-   venv\Scripts\activate
-   pip install -r requirements.txt
-   python src/08_pipeline.py
-   ```
-   OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
-
----
-
-## 🖥️ Usage
-
-1. **Run Full Pipeline** - Processes invoices and writes outputs
-
-   ```bash
-   python src/08_pipeline.py
-   ```
-
-   ---
-
-2. **Outputs**
-
-   - **data/categorized.csv**: High-confidence auto-tagged items  
-   - **`data/manual_review.csv`**: Items requiring human validation  
-   - **`logs/pipeline.log`**: Detailed logging of categorization events  
-
-
----
-
-
 ## 📁 Data Format
 
 Prepare your invoice CSV like this:
@@ -121,7 +74,7 @@ Prepare your invoice CSV like this:
 
 ---
 
-## 🌐 Web UI (Optional)
+## 🌐 Web UI
    - To run a lightweight Flask interface:
 
      ````bash
@@ -176,6 +129,54 @@ Prepare your invoice CSV like this:
    - Subhav Jain
    - Sidhant Budhiraja
    - Prayash Pandey
+
+---
+
+
+
+## ⚙️ Prerequisites
+
+   - Python 3.9+
+   - [OpenAI API Key](https://platform.openai.com/account/api-keys)
+
+---
+
+
+## 📦 Installation
+
+
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/yourusername/acme-spend-categorization.git
+   cd acme-spend-categorization
+   python3 -m venv venv
+   source venv/bin/activate  # macOS/Linux
+   # OR for Windows
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   python src/08_pipeline.py
+   ```
+   OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+---
+
+## 🖥️ Usage
+
+1. **Run Full Pipeline** - Processes invoices and writes outputs
+
+   ```bash
+   python src/08_pipeline.py
+   ```
+
+   ---
+
+2. **Outputs**
+
+   - **data/categorized.csv**: High-confidence auto-tagged items  
+   - **`data/manual_review.csv`**: Items requiring human validation  
+   - **`logs/pipeline.log`**: Detailed logging of categorization events  
+
 
 ---
 
