@@ -1,4 +1,4 @@
-# 🧾 ACME Spend Categorization (UNSPSC Categorizer)
+# 🧾 ACME Spend Categorization (UNSPSC CodeGenAI)
 
 An advanced, intelligent spend categorization system designed to automatically classify invoice-level procurement data using a hybrid approach that combines both rule-based logic and AI-driven semantic understanding. The system is architected to be scalable, accurate, and human-in-the-loop friendly, enabling organizations to process large volumes of invoice descriptions while maintaining control, auditability, and transparency over categorization decisions.
 
