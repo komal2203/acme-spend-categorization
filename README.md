@@ -75,7 +75,7 @@ Prepare your invoice CSV like this:
 ---
 
 ## 🌐 Web UI
-   - 👉🏻Check Deployed Site: [Live Demo]!(https://mckinseydtu-1df9110d4e6a.herokuapp.com/)
+   - 👉🏻Check Deployed Site: [Live Demo](https://mckinseydtu-1df9110d4e6a.herokuapp.com/)
    
    - **Main Dashboard**<br><br>![Main Dashboard](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard1.png)
    - **After Running the Model**<br><br>![After Running the model](https://github.com/komal2203/acme-spend-categorization/blob/main/ui_images_for_readme/main_dashboard2.png)
